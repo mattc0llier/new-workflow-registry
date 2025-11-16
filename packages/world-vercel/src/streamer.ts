@@ -18,11 +18,14 @@ export function createStreamer(config?: APIConfig): Streamer {
   return {
     async writeToStream(
       name: string,
-      runId: string,
+      runId: string | Promise<string>,
       chunk: string | Uint8Array
     ) {
+      // Await runId if it's a promise to ensure proper flushing
+      const resolvedRunId = await runId;
+
       const httpConfig = await getHttpConfig(config);
-      await fetch(getStreamUrl(name, runId, httpConfig), {
+      await fetch(getStreamUrl(name, resolvedRunId, httpConfig), {
         method: 'PUT',
         body: chunk,
         headers: httpConfig.headers,
@@ -30,10 +33,13 @@ export function createStreamer(config?: APIConfig): Streamer {
       });
     },
 
-    async closeStream(name: string, runId: string) {
+    async closeStream(name: string, runId: string | Promise<string>) {
+      // Await runId if it's a promise to ensure proper flushing
+      const resolvedRunId = await runId;
+
       const httpConfig = await getHttpConfig(config);
       httpConfig.headers.set('X-Stream-Done', 'true');
-      await fetch(getStreamUrl(name, runId, httpConfig), {
+      await fetch(getStreamUrl(name, resolvedRunId, httpConfig), {
         method: 'PUT',
         headers: httpConfig.headers,
       });

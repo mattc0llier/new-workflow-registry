@@ -3,10 +3,7 @@ import { WorkflowRuntimeError } from '@workflow/errors';
 import { withResolvers } from '@workflow/utils';
 import { Run } from '../runtime.js';
 import type { Serializable, WorkflowInvokePayload } from '../schemas.js';
-import {
-  dehydrateWorkflowArguments,
-  type StreamOperationPromise,
-} from '../serialization.js';
+import { dehydrateWorkflowArguments } from '../serialization.js';
 import * as Attribute from '../telemetry/semantic-conventions.js';
 import { serializeTraceCarrier, trace } from '../telemetry.js';
 import { waitedUntil } from '../util.js';
@@ -90,7 +87,7 @@ export async function start<TArgs extends unknown[], TResult>(
 
       const world = getWorld();
       const deploymentId = opts.deploymentId ?? (await world.getDeploymentId());
-      const ops: StreamOperationPromise[] = [];
+      const ops: Promise<void>[] = [];
       const { promise: runIdPromise, resolve: resolveRunId } =
         withResolvers<string>();
 

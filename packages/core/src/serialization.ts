@@ -9,8 +9,6 @@ import {
   WEBHOOK_RESPONSE_WRITABLE,
 } from './symbols.js';
 
-export type StreamOperationPromise = Promise<void>;
-
 /**
  * Detect if a readable stream is a byte stream.
  *
@@ -325,7 +323,7 @@ function getCommonReducers(global: Record<string, any> = globalThis) {
  */
 export function getExternalReducers(
   global: Record<string, any> = globalThis,
-  ops: StreamOperationPromise[],
+  ops: Promise<void>[],
   runId: string | Promise<string>
 ): Reducers {
   return {
@@ -430,7 +428,7 @@ export function getWorkflowReducers(
  */
 function getStepReducers(
   global: Record<string, any> = globalThis,
-  ops: StreamOperationPromise[],
+  ops: Promise<void>[],
   runId: string | Promise<string>
 ): Reducers {
   return {
@@ -598,7 +596,7 @@ export function getCommonRevivers(global: Record<string, any> = globalThis) {
  */
 export function getExternalRevivers(
   global: Record<string, any> = globalThis,
-  ops: StreamOperationPromise[],
+  ops: Promise<void>[],
   runId: string | Promise<string>
 ): Revivers {
   return {
@@ -736,7 +734,7 @@ export function getWorkflowRevivers(
  */
 function getStepRevivers(
   global: Record<string, any> = globalThis,
-  ops: StreamOperationPromise[],
+  ops: Promise<void>[],
   runId: string | Promise<string>
 ): Revivers {
   return {
@@ -819,7 +817,7 @@ function getStepRevivers(
  */
 export function dehydrateWorkflowArguments(
   value: unknown,
-  ops: StreamOperationPromise[],
+  ops: Promise<void>[],
   runId: string | Promise<string>,
   global: Record<string, any> = globalThis
 ) {
@@ -895,7 +893,7 @@ export function dehydrateWorkflowReturnValue(
  */
 export function hydrateWorkflowReturnValue(
   value: Parameters<typeof devalue.unflatten>[0],
-  ops: StreamOperationPromise[],
+  ops: Promise<void>[],
   runId: string | Promise<string>,
   global: Record<string, any> = globalThis,
   extraRevivers: Record<string, (value: any) => any> = {}

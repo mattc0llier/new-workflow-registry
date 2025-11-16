@@ -50,9 +50,12 @@ export function createStreamer(basedir: string): Streamer {
   return {
     async writeToStream(
       name: string,
-      _runId: string,
+      _runId: string | Promise<string>,
       chunk: string | Uint8Array
     ) {
+      // Await runId if it's a promise to ensure proper flushing
+      await _runId;
+
       const chunkId = `strm_${monotonicUlid()}`;
 
       if (typeof chunk === 'string') {
@@ -87,7 +90,10 @@ export function createStreamer(basedir: string): Streamer {
       });
     },
 
-    async closeStream(name: string, _runId: string) {
+    async closeStream(name: string, _runId: string | Promise<string>) {
+      // Await runId if it's a promise to ensure proper flushing
+      await _runId;
+
       const chunkId = `strm_${monotonicUlid()}`;
       const chunkPath = path.join(
         basedir,

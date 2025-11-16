@@ -34,10 +34,10 @@ import type {
 export interface Streamer {
   writeToStream(
     name: string,
-    runId: string,
+    runId: string | Promise<string>,
     chunk: string | Uint8Array
   ): Promise<void>;
-  closeStream(name: string, runId: string): Promise<void>;
+  closeStream(name: string, runId: string | Promise<string>): Promise<void>;
   readFromStream(
     name: string,
     startIndex?: number
