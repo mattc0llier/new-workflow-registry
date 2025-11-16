@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 const Logo = () => (
   <span className="flex items-center gap-1.5 font-semibold text-foreground tracking-tight text-xl">
     <svg
-      className="hidden sm:block"
       fill="none"
       height={18}
       viewBox="0 0 305 234"
@@ -20,7 +19,7 @@ const Logo = () => (
         <path d="m8.77454 163.8c-4.8461 0-8.77441793 3.929-8.77441793 8.775v52.65c0 4.846 3.92831793 8.775 8.77441793 8.775h52.65036c4.8463 0 8.7754-3.929 8.7754-8.775v-52.65c0-4.846-3.9291-8.775-8.7754-8.775z" />
       </g>
     </svg>
-    Workflow
+    <span className="hidden sm:block">Workflow</span>
   </span>
 );
 

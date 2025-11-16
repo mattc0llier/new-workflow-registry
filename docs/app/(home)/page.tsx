@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 const Home = () => (
-  <div className="bg-sidebar [&_h1]:tracking-tighter [&_h2]:tracking-tighter [&_h3]:tracking-tighter [&_h4]:tracking-tighter [&_h5]:tracking-tighter [&_h6]:tracking-tighter">
+  <div className="[&_h1]:tracking-tighter [&_h2]:tracking-tighter [&_h3]:tracking-tighter [&_h4]:tracking-tighter [&_h5]:tracking-tighter [&_h6]:tracking-tighter">
     <div className="mx-auto w-full max-w-[1080px]">
       <Hero title={title} description={description} />
       <div className="grid divide-y border-y sm:border-x">

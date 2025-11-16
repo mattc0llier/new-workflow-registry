@@ -12,17 +12,14 @@ import { TooltipProvider } from '../ui/tooltip';
 import { SearchDialog } from './search';
 
 type GeistdocsProviderProps = ComponentProps<typeof RootProvider> & {
-  basePath?: string;
   className?: string;
 };
 
 export const GeistdocsProvider = ({
-  basePath = '',
   search,
   className,
   ...props
 }: GeistdocsProviderProps) => {
-  const apiPath = `${basePath}/api/search`;
   const { isOpen } = useChatContext();
   const isMobile = useIsMobile();
 
@@ -38,9 +35,6 @@ export const GeistdocsProvider = ({
         <RootProvider
           search={{
             SearchDialog,
-            options: {
-              api: apiPath,
-            },
             ...search,
           }}
           {...props}
