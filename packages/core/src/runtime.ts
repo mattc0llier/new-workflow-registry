@@ -644,8 +644,7 @@ export const stepEntrypoint =
               // We should only be running the step if it's either
               // a) pending - initial state, or state set on re-try
               // b) running - if a step fails mid-execution, like a function timeout
-              // so the step has been
-              // invoked erroneously.
+              // otherwise, the step has been invoked erroneously
               console.error(
                 `[Workflows] "${workflowRunId}" - Step invoked erroneously, expected status "pending" or "running", got "${step.status}" instead, skipping execution`
               );
