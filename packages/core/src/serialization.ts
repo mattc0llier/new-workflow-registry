@@ -136,7 +136,8 @@ export class WorkflowServerWritableStream extends WritableStream<Uint8Array> {
         await world.writeToStream(name, _runId, chunk);
       },
       async close() {
-        await world.closeStream(name);
+        const _runId = await runId;
+        await world.closeStream(name, _runId);
       },
     });
   }

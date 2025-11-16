@@ -30,10 +30,10 @@ export function createStreamer(config?: APIConfig): Streamer {
       });
     },
 
-    async closeStream(name: string) {
+    async closeStream(name: string, runId: string) {
       const httpConfig = await getHttpConfig(config);
       httpConfig.headers.set('X-Stream-Done', 'true');
-      await fetch(getStreamUrl(name, undefined, httpConfig), {
+      await fetch(getStreamUrl(name, runId, httpConfig), {
         method: 'PUT',
         headers: httpConfig.headers,
       });

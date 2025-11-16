@@ -21,11 +21,7 @@ export function idempotency(world: string) {
       }
     );
 
-    const output = await hydrateWorkflowReturnValue(
-      run.output,
-      [],
-      run.runId as string
-    );
+    const output = await hydrateWorkflowReturnValue(run.output, [], run.runId);
 
     expect(output).toEqual({
       numbers: Array.from({ length: 110 }, () => expect.any(Number)),

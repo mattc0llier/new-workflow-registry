@@ -87,7 +87,7 @@ export function createStreamer(basedir: string): Streamer {
       });
     },
 
-    async closeStream(name: string) {
+    async closeStream(name: string, _runId: string) {
       const chunkId = `strm_${monotonicUlid()}`;
       const chunkPath = path.join(
         basedir,

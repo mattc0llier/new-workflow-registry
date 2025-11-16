@@ -37,7 +37,7 @@ export interface Streamer {
     runId: string,
     chunk: string | Uint8Array
   ): Promise<void>;
-  closeStream(name: string): Promise<void>;
+  closeStream(name: string, runId: string): Promise<void>;
   readFromStream(
     name: string,
     startIndex?: number
