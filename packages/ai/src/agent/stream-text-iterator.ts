@@ -4,12 +4,7 @@ import type {
   LanguageModelV2ToolCall,
   LanguageModelV2ToolResultPart,
 } from '@ai-sdk/provider';
-import type {
-  StepResult,
-  StreamTextOnErrorCallback,
-  ToolSet,
-  UIMessageChunk,
-} from 'ai';
+import type { StepResult, ToolSet, UIMessageChunk } from 'ai';
 import { doStreamStep, type ModelStopCondition } from './do-stream-step.js';
 import { toolsToModelTools } from './tools-to-model-tools.js';
 
@@ -20,14 +15,12 @@ export async function* streamTextIterator({
   writable,
   model,
   stopConditions,
-  onError,
 }: {
   prompt: LanguageModelV2Prompt;
   tools: ToolSet;
   writable: WritableStream<UIMessageChunk>;
   model: string | (() => Promise<LanguageModelV2>);
   stopConditions?: ModelStopCondition[] | ModelStopCondition;
-  onError?: StreamTextOnErrorCallback;
 }): AsyncGenerator<
   LanguageModelV2ToolCall[],
   void,
