@@ -372,10 +372,10 @@ export async function doStreamStep(
     )
     .pipeTo(writable, { preventClose: true });
 
-  if (!finish) {
-    // This will cause the step to be retried
-    throw new Error('LLM stream ended without a "finish" chunk');
-  }
+  // if (!finish) {
+  //   // This will cause the step to be retried
+  //   throw new Error('LLM stream ended without a "finish" chunk');
+  // }
 
   const step = chunksToStep(chunks, finish, toolCalls, conversationPrompt);
   return { toolCalls, finish, step };
