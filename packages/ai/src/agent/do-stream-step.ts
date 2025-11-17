@@ -377,15 +377,15 @@ export async function doStreamStep(
   //   throw new Error('LLM stream ended without a "finish" chunk');
   // }
 
-  const step = chunksToStep(chunks, finish, toolCalls, conversationPrompt);
+  const step = chunksToStep(chunks, toolCalls, conversationPrompt, finish);
   return { toolCalls, finish, step };
 }
 
 function chunksToStep(
   chunks: LanguageModelV2StreamPart[],
-  finish: FinishPart,
   toolCalls: LanguageModelV2ToolCall[],
-  conversationPrompt: LanguageModelV2Prompt
+  conversationPrompt: LanguageModelV2Prompt,
+  finish?: FinishPart
 ): StepResult<any> {
   // Transform chunks to a single step result
   const text = chunks
@@ -452,8 +452,8 @@ function chunksToStep(
     toolResults: [],
     staticToolResults: [],
     dynamicToolResults: [],
-    finishReason: finish.finishReason,
-    usage: finish.usage,
+    finishReason: finish?.finishReason || 'unknown',
+    usage: finish?.usage || { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
     warnings: streamStart?.warnings,
     request: {
       body: JSON.stringify({
@@ -473,7 +473,7 @@ function chunksToStep(
       modelId: responseMetadata?.modelId ?? 'unknown',
       messages: [],
     },
-    providerMetadata: finish.providerMetadata,
+    providerMetadata: finish?.providerMetadata || {},
   };
 
   return stepResult;
