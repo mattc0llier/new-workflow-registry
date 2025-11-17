@@ -369,13 +369,109 @@ export async function doStreamStep(
     )
     .pipeTo(writable, { preventClose: true });
 
-  // if (!finish) {
-  //   // This will cause the step to be retried
-  //   throw new Error('LLM stream ended without a "finish" chunk');
-  // }
+  if (!finish) {
+    // This will cause the step to be retried
+    throw new Error('LLM stream ended without a "finish" chunk');
+  }
 
-  // TODO: Chunks to steps?
-  const steps: StepResult<any>[] = [];
+  const step = chunksToStep(chunks, finish, toolCalls, conversationPrompt);
+  return { toolCalls, finish, step };
+}
 
-  return { toolCalls, finish, steps };
+function chunksToStep(
+  chunks: LanguageModelV2StreamPart[],
+  finish: FinishPart,
+  toolCalls: LanguageModelV2ToolCall[],
+  conversationPrompt: LanguageModelV2Prompt
+): StepResult<any> {
+  // Transform chunks to a single step result
+  const text = chunks
+    .filter(
+      (chunk): chunk is Extract<typeof chunk, { type: 'text-delta' }> =>
+        chunk.type === 'text-delta'
+    )
+    .map((chunk) => chunk.delta)
+    .join('');
+
+  const reasoning = chunks.filter(
+    (chunk): chunk is Extract<typeof chunk, { type: 'reasoning-delta' }> =>
+      chunk.type === 'reasoning-delta'
+  );
+
+  const reasoningText = reasoning.map((chunk) => chunk.delta).join('');
+
+  // Extract warnings from stream-start chunk
+  const streamStart = chunks.find(
+    (chunk): chunk is Extract<typeof chunk, { type: 'stream-start' }> =>
+      chunk.type === 'stream-start'
+  );
+
+  // Extract response metadata from response-metadata chunk
+  const responseMetadata = chunks.find(
+    (chunk): chunk is Extract<typeof chunk, { type: 'response-metadata' }> =>
+      chunk.type === 'response-metadata'
+  );
+
+  const stepResult: StepResult<any> = {
+    content: [
+      ...(text ? [{ type: 'text' as const, text }] : []),
+      ...toolCalls.map((toolCall) => ({
+        type: 'tool-call' as const,
+        toolCallId: toolCall.toolCallId,
+        toolName: toolCall.toolName,
+        input: JSON.parse(toolCall.input),
+        dynamic: true as const,
+      })),
+    ],
+    text,
+    reasoning: reasoning.map((chunk) => ({
+      type: 'reasoning' as const,
+      text: chunk.delta,
+    })),
+    reasoningText: reasoningText || undefined,
+    files: [],
+    sources: [],
+    toolCalls: toolCalls.map((toolCall) => ({
+      type: 'tool-call' as const,
+      toolCallId: toolCall.toolCallId,
+      toolName: toolCall.toolName,
+      input: JSON.parse(toolCall.input),
+      dynamic: true as const,
+    })),
+    staticToolCalls: [],
+    dynamicToolCalls: toolCalls.map((toolCall) => ({
+      type: 'tool-call' as const,
+      toolCallId: toolCall.toolCallId,
+      toolName: toolCall.toolName,
+      input: JSON.parse(toolCall.input),
+      dynamic: true as const,
+    })),
+    toolResults: [],
+    staticToolResults: [],
+    dynamicToolResults: [],
+    finishReason: finish.finishReason,
+    usage: finish.usage,
+    warnings: streamStart?.warnings,
+    request: {
+      body: JSON.stringify({
+        prompt: conversationPrompt,
+        tools: toolCalls.map((toolCall) => ({
+          type: 'tool-call' as const,
+          toolCallId: toolCall.toolCallId,
+          toolName: toolCall.toolName,
+          input: JSON.parse(toolCall.input),
+          dynamic: true as const,
+        })),
+      }),
+    },
+    response: {
+      id: responseMetadata?.id ?? 'unknown',
+      timestamp: responseMetadata?.timestamp ?? new Date(),
+      modelId: responseMetadata?.modelId ?? 'unknown',
+      messages: [],
+    },
+    providerMetadata: finish.providerMetadata,
+  };
+
+  return stepResult;
 }

@@ -4,7 +4,12 @@ import type {
   LanguageModelV2ToolCall,
   LanguageModelV2ToolResultPart,
 } from '@ai-sdk/provider';
-import type { StreamTextOnErrorCallback, ToolSet, UIMessageChunk } from 'ai';
+import type {
+  StepResult,
+  StreamTextOnErrorCallback,
+  ToolSet,
+  UIMessageChunk,
+} from 'ai';
 import { doStreamStep, type ModelStopCondition } from './do-stream-step.js';
 import { toolsToModelTools } from './tools-to-model-tools.js';
 
@@ -30,14 +35,16 @@ export async function* streamTextIterator({
 > {
   const conversationPrompt = [...prompt]; // Create a mutable copy
 
+  const steps: StepResult<any>[] = [];
   let done = false;
   while (!done) {
-    const { toolCalls, finish, steps } = await doStreamStep(
+    const { toolCalls, finish, step } = await doStreamStep(
       conversationPrompt,
       model,
       writable,
       toolsToModelTools(tools)
     );
+    steps.push(step);
 
     if (finish?.finishReason === 'tool-calls') {
       // Add assistant message with tool calls to the conversation
