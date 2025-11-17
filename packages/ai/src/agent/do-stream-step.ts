@@ -5,9 +5,17 @@ import type {
   LanguageModelV2StreamPart,
   LanguageModelV2ToolCall,
 } from '@ai-sdk/provider';
-import { gateway, type UIMessageChunk } from 'ai';
+import {
+  gateway,
+  type StepResult,
+  type StopCondition,
+  type ToolSet,
+  type UIMessageChunk,
+} from 'ai';
 
 type FinishPart = Extract<LanguageModelV2StreamPart, { type: 'finish' }>;
+
+export type ModelStopCondition = StopCondition<NoInfer<ToolSet>>;
 
 export async function doStreamStep(
   conversationPrompt: LanguageModelV2Prompt,
@@ -35,6 +43,7 @@ export async function doStreamStep(
 
   let finish: FinishPart | undefined;
   const toolCalls: LanguageModelV2ToolCall[] = [];
+  const chunks: LanguageModelV2StreamPart[] = [];
 
   await result.stream
     .pipeThrough(
@@ -48,6 +57,7 @@ export async function doStreamStep(
           } else if (chunk.type === 'finish') {
             finish = chunk;
           }
+          chunks.push(chunk);
           controller.enqueue(chunk);
         },
       })
@@ -236,7 +246,6 @@ export async function doStreamStep(
                 // ...(dynamic != null ? { dynamic } : {}),
               });
               // }
-
               break;
             }
 
@@ -365,5 +374,8 @@ export async function doStreamStep(
   //   throw new Error('LLM stream ended without a "finish" chunk');
   // }
 
-  return { toolCalls, finish };
+  // TODO: Chunks to steps?
+  const steps: StepResult<any>[] = [];
+
+  return { toolCalls, finish, steps };
 }

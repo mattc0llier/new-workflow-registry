@@ -6,6 +6,8 @@ import type {
 import {
   asSchema,
   type ModelMessage,
+  type StopCondition,
+  type StreamTextOnErrorCallback,
   type ToolSet,
   type UIMessageChunk,
 } from 'ai';
@@ -62,6 +64,20 @@ export interface DurableAgentStreamOptions {
    * Defaults to false (stream will be closed).
    */
   preventClose?: boolean;
+
+  /**
+   * Callback to handle errors that occur during streaming.
+   */
+  onError?: StreamTextOnErrorCallback;
+
+  /**
+   * Condition for stopping the generation when there are tool results in the last step.
+   * When the condition is an array, any of the conditions can be met to stop the generation.
+   * @default stepCountIs(1)
+   */
+  stopWhen?:
+    | StopCondition<NoInfer<ToolSet>>
+    | Array<StopCondition<NoInfer<ToolSet>>>;
 }
 
 /**
@@ -125,6 +141,8 @@ export class DurableAgent {
       tools: this.tools,
       writable,
       prompt: modelPrompt,
+      stopConditions: options.stopWhen,
+      onError: options.onError,
     });
 
     let result = await iterator.next();
