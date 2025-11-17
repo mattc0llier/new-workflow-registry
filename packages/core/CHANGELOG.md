@@ -1,5 +1,11 @@
 # @workflow/core
 
+## 4.0.1-beta.13
+
+### Patch Changes
+
+- 2fde24e: Use inline sourcemaps to prevent SWC read import error
+
 ## 4.0.1-beta.12
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @workflow/web-shared
 
+## 4.0.1-beta.14
+
+### Patch Changes
+
+- Updated dependencies [2fde24e]
+  - @workflow/core@4.0.1-beta.13
+
 ## 4.0.1-beta.13
 
 ### Patch Changes
