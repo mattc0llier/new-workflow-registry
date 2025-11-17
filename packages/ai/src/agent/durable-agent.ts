@@ -7,7 +7,6 @@ import {
   asSchema,
   type ModelMessage,
   type StopCondition,
-  type StreamTextOnErrorCallback,
   type ToolSet,
   type UIMessageChunk,
 } from 'ai';
