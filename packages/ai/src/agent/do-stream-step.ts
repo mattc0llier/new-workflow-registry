@@ -299,13 +299,16 @@ export async function doStreamStep(
             //   break;
             // }
 
-            // case "error": {
-            //   controller.enqueue({
-            //     type: "error",
-            //     errorText: onError(part.error),
-            //   });
-            //   break;
-            // }
+            case 'error': {
+              const error = part.error;
+              controller.enqueue({
+                type: 'error',
+                errorText:
+                  error instanceof Error ? error.message : String(error),
+              });
+
+              break;
+            }
 
             // case "start-step": {
             //   controller.enqueue({ type: "start-step" });
