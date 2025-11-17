@@ -11,6 +11,14 @@ const config = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.logo.dev',
+      },
+    ],
+  },
   async rewrites() {
     return {
       beforeFiles: [

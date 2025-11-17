@@ -52,8 +52,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 secondary: false,
               },
               {
-                text: 'Examples',
-                url: 'https://github.com/vercel/workflow-examples',
+                text: 'Steps',
+                url: '/steps',
+                secondary: false,
+              },
+              {
+                text: 'Integrations',
+                url: '/integrations',
+                secondary: false,
+              },
+              {
+                text: 'Workflows',
+                url: '/workflows',
                 secondary: false,
               },
             ]}
