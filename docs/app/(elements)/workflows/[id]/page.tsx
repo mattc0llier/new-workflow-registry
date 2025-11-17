@@ -3,10 +3,15 @@ import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { WORKFLOWS, STEPS } from '@/lib/elements-data';
-import { ArrowRight } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 
-export default function WorkflowPage({ params }: { params: { id: string } }) {
-  const workflow = WORKFLOWS.find((w) => w.id === params.id);
+export default async function WorkflowPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const workflow = WORKFLOWS.find((w) => w.id === id);
 
   if (!workflow) {
     notFound();
@@ -17,7 +22,10 @@ export default function WorkflowPage({ params }: { params: { id: string } }) {
       ...ws,
       step: STEPS.find((s) => s.id === ws.stepId),
     }))
-    .filter((ws) => ws.step);
+    .filter(
+      (ws): ws is typeof ws & { step: NonNullable<typeof ws.step> } =>
+        ws.step !== undefined
+    );
 
   return (
     <main className="flex w-full min-w-0 flex-col">
@@ -49,14 +57,16 @@ export default function WorkflowPage({ params }: { params: { id: string } }) {
           {/* Prerequisites */}
           {workflow.prerequisites && workflow.prerequisites.length > 0 && (
             <div className="not-prose mb-8">
-              <h2 className="text-2xl font-semibold mb-3">Prerequisites</h2>
-              <Card>
-                <CardContent className="pt-6">
-                  <ul className="space-y-2">
+              <h2 className="text-2xl font-semibold mb-4">Prerequisites</h2>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-6 pb-6">
+                  <ul className="space-y-3">
                     {workflow.prerequisites.map((prereq, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <span className="text-primary mt-1">✓</span>
-                        <span>{prereq}</span>
+                      <li key={idx} className="flex items-start gap-3">
+                        <span className="text-primary mt-0.5 text-lg">✓</span>
+                        <span className="text-base leading-relaxed">
+                          {prereq}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -109,8 +119,8 @@ export default function WorkflowPage({ params }: { params: { id: string } }) {
                     </Card>
                   </Link>
                   {idx < workflowSteps.length - 1 && (
-                    <div className="flex justify-center py-2">
-                      <ArrowRight className="text-muted-foreground" />
+                    <div className="flex justify-center pt-6 pb-3">
+                      <ArrowDown className="text-muted-foreground" />
                     </div>
                   )}
                 </div>

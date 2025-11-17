@@ -8,8 +8,13 @@ import { CopyButton } from '@/components/copy-button';
 import { CodeBlock } from '@/components/code-block';
 import { STEPS, WORKFLOWS, INTEGRATIONS } from '@/lib/elements-data';
 
-export default async function StepPage({ params }: { params: { id: string } }) {
-  const step = STEPS.find((s) => s.id === params.id);
+export default async function StepPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const step = STEPS.find((s) => s.id === id);
 
   if (!step) {
     notFound();

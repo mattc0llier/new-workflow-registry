@@ -12,12 +12,13 @@ import { CompanyLogo } from '@/components/company-logo';
 import { INTEGRATIONS, STEPS, WORKFLOWS } from '@/lib/elements-data';
 import { ExternalLink } from 'lucide-react';
 
-export default function IntegrationPage({
+export default async function IntegrationPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const integration = INTEGRATIONS.find((i) => i.id === params.id);
+  const { id } = await params;
+  const integration = INTEGRATIONS.find((i) => i.id === id);
 
   if (!integration) {
     notFound();
