@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "turbo build --filter=docs^... --filter=docs",
+  "buildCommand": "turbo build --filter=docs^... --filter=docs --filter=!@workflow/swc-plugin",
   "devCommand": "cd docs && pnpm dev",
   "installCommand": "pnpm install",
   "framework": "nextjs",
