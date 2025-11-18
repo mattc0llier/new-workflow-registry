@@ -1,0 +1,16 @@
+{
+  "name": "slackbot-agent",
+  "type": "registry:block",
+  "title": "AI Slackbot Agent",
+  "description": "An intelligent Slack bot that responds to messages using GPT",
+  "registryDependencies": [],
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/workflows/slackbot-agent.tsx",
+      "type": "registry:component",
+      "content": "import { workflow } from '@vercel/workflow';\nimport { openaiChat } from '@/steps/openai-chat';\nimport { sendSlackMessage } from '@/steps/send-slack-message';\n\ntype SlackbotParams = {\n  channel: string;\n  userMessage: string;\n  context?: string;\n};\n\nexport const slackbotAgent = workflow(\n  'slackbot-agent',\n  async (params: SlackbotParams) => {\n    // Step 1: Generate AI response\n    const aiResponse = await openaiChat({\n      messages: [\n        {\n          role: 'system',\n          content: params.context || 'You are a helpful Slack assistant.',\n        },\n        {\n          role: 'user',\n          content: params.userMessage,\n        },\n      ],\n    });\n\n    // Step 2: Send response to Slack\n    await sendSlackMessage({\n      channel: params.channel,\n      text: aiResponse,\n    });\n\n    return { success: true, response: aiResponse };\n  }\n);\n",
+      "target": "components/workflows/slackbot-agent.tsx"
+    }
+  ]
+}

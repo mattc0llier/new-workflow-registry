@@ -134,6 +134,30 @@
       "type": "registry:block",
       "title": "Together AI",
       "description": "Run open-source models with Together AI inference"
+    },
+    {
+      "name": "ai-content-pipeline",
+      "type": "registry:block",
+      "title": "AI Content Generation Pipeline",
+      "description": "Generate blog content with AI, create a cover image, and distribute via email"
+    },
+    {
+      "name": "payment-processing",
+      "type": "registry:block",
+      "title": "Payment Processing",
+      "description": "Handle payment collection and confirmation"
+    },
+    {
+      "name": "slackbot-agent",
+      "type": "registry:block",
+      "title": "AI Slackbot Agent",
+      "description": "An intelligent Slack bot that responds to messages using GPT"
+    },
+    {
+      "name": "user-onboarding",
+      "type": "registry:block",
+      "title": "User Onboarding Flow",
+      "description": "Automated email workflow for welcoming new users"
     }
   ]
 }

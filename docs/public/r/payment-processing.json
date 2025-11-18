@@ -1,0 +1,16 @@
+{
+  "name": "payment-processing",
+  "type": "registry:block",
+  "title": "Payment Processing",
+  "description": "Handle payment collection and confirmation",
+  "registryDependencies": [],
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/workflows/payment-processing.tsx",
+      "type": "registry:component",
+      "content": "import { workflow } from '@vercel/workflow';\nimport { stripePayment } from '@/steps/stripe-payment';\nimport { sendEmail } from '@/steps/send-email-resend';\n\ntype PaymentParams = {\n  amount: number;\n  currency: string;\n  customerId: string;\n  customerEmail: string;\n};\n\nexport const paymentProcessing = workflow(\n  'payment-processing',\n  async (params: PaymentParams) => {\n    // Step 1: Process payment\n    const payment = await stripePayment({\n      amount: params.amount,\n      currency: params.currency,\n      customerId: params.customerId,\n      description: 'Product purchase',\n    });\n\n    // Step 2: Send confirmation email\n    await sendEmail({\n      to: params.customerEmail,\n      subject: 'Payment Confirmed',\n      html: `\n        <h1>Payment Successful</h1>\n        <p>Your payment of ${params.currency.toUpperCase()} ${params.amount / 100} has been processed.</p>\n      `,\n    });\n\n    return { success: true, paymentId: payment.id };\n  }\n);\n",
+      "target": "components/workflows/payment-processing.tsx"
+    }
+  ]
+}

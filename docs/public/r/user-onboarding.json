@@ -1,0 +1,16 @@
+{
+  "name": "user-onboarding",
+  "type": "registry:block",
+  "title": "User Onboarding Flow",
+  "description": "Automated email workflow for welcoming new users",
+  "registryDependencies": [],
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/workflows/user-onboarding.tsx",
+      "type": "registry:component",
+      "content": "import { workflow } from '@vercel/workflow';\nimport { sendEmail } from '@/steps/send-email-resend';\n\ntype OnboardingParams = {\n  email: string;\n  name: string;\n};\n\nexport const userOnboarding = workflow(\n  'user-onboarding',\n  async (params: OnboardingParams) => {\n    // Send welcome email\n    await sendEmail({\n      to: params.email,\n      subject: 'Welcome to our platform! 👋',\n      html: `\n        <h1>Hi ${params.name}!</h1>\n        <p>Welcome to our platform. We're excited to have you here.</p>\n        <p>Get started by exploring our features...</p>\n      `,\n    });\n\n    return { success: true };\n  }\n);\n",
+      "target": "components/workflows/user-onboarding.tsx"
+    }
+  ]
+}
