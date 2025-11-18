@@ -1,11 +1,4 @@
-import fs from 'fs';
-import path from 'path';
 import type { Workflow } from '../elements-types';
-
-const code = fs.readFileSync(
-  path.join(__dirname, '../workflow-implementations/slackbot-agent.ts'),
-  'utf-8'
-);
 
 export const slackbotAgent: Workflow = {
   id: 'slackbot-agent',
@@ -26,7 +19,44 @@ export const slackbotAgent: Workflow = {
       description: 'Send the AI-generated response back to Slack',
     },
   ],
-  code,
+  code: `import { workflow } from '@vercel/workflow';
+import { openaiChat } from '@/steps/openai-chat';
+import { sendSlackMessage } from '@/steps/send-slack-message';
+
+type SlackbotParams = {
+  channel: string;
+  userMessage: string;
+  context?: string;
+};
+
+export const slackbotAgent = workflow(
+  'slackbot-agent',
+  async (params: SlackbotParams) => {
+    // Step 1: Generate AI response
+    const aiResponse = await openaiChat({
+      messages: [
+        {
+          role: 'system',
+          content: params.context || 'You are a helpful Slack assistant.',
+        },
+        {
+          role: 'user',
+          content: params.userMessage,
+        },
+      ],
+    });
+
+    // Step 2: Send response to Slack
+    await sendSlackMessage({
+      channel: params.channel,
+      text: aiResponse,
+    });
+
+    return { success: true, response: aiResponse };
+  }
+);
+`,
+
   useCase:
     'Build an intelligent Slack bot that can answer questions, help with tasks, and engage with your team using AI.',
   prerequisites: ['OpenAI API key', 'Slack Bot token with chat:write scope'],
