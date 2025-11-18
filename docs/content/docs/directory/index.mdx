@@ -1,22 +1,51 @@
 ---
 title: Directory
-description: Learn how to use the Workflow Directory to discover and share reusable steps
 ---
 
 # Workflow Directory
 
-The Workflow Directory is a registry of reusable steps and workflows that you can use in your projects. Browse community-contributed steps, learn how to install and use them, and contribute your own.
+The Workflow Directory is a collection of reusable steps and workflows that you can use in your projects. Browse community-contributed steps, learn how to install and use them, and contribute your own.
 
-## What is the Directory?
+<div className="grid gap-6 sm:grid-cols-3 mt-12 mb-8">
+  <div>
+    <div className="mb-3 flex size-12 items-center justify-center rounded-lg bg-muted">
+      <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <title>Auto Copy & Paste</title>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+      </svg>
+    </div>
+    <h3 className="font-semibold mb-2">Auto Copy & Paste</h3>
+    <p className="text-sm text-muted-foreground">
+      No npm packages required. Copy the step code directly into your project and customize it to your needs.
+    </p>
+  </div>
 
-The Workflow Directory provides a centralized place to discover, share, and manage reusable workflow steps. Instead of building everything from scratch, you can leverage steps created by the community or share your own implementations.
+  <div>
+    <div className="mb-3 flex size-12 items-center justify-center rounded-lg bg-muted">
+      <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <title>Built for Reliability</title>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    </div>
+    <h3 className="font-semibold mb-2">Built for Reliability</h3>
+    <p className="text-sm text-muted-foreground">
+      Every step includes automatic retries, error handling, and durability out of the box using Workflow DevKit.
+    </p>
+  </div>
 
-## Key Features
-
-- **Discover Steps**: Browse available steps for common tasks
-- **Easy Installation**: Simple package-based installation
-- **MCP Integration**: Seamlessly integrate with Model Context Protocol servers
-- **Community Contributions**: Share your steps with the community
+  <div>
+    <div className="mb-3 flex size-12 items-center justify-center rounded-lg bg-muted">
+      <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <title>TypeScript First</title>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+      </svg>
+    </div>
+    <h3 className="font-semibold mb-2">TypeScript First</h3>
+    <p className="text-sm text-muted-foreground">
+      Fully typed step definitions with clear interfaces and comprehensive examples. Works seamlessly with your IDE.
+    </p>
+  </div>
+</div>
 
 ## Getting Started
 
@@ -32,10 +61,6 @@ The Workflow Directory provides a centralized place to discover, share, and mana
     <Card href="/docs/directory/mcp-server">
         <h3>MCP Server</h3>
         <p>Integrate with Model Context Protocol</p>
-    </Card>
-    <Card href="/docs/directory/creating-steps">
-        <h3>Creating Steps</h3>
-        <p>Build your own reusable workflow steps</p>
     </Card>
     <Card href="/docs/directory/contributing-steps">
         <h3>Contributing</h3>

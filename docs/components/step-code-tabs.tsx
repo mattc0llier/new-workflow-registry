@@ -1,25 +1,17 @@
 'use client';
 
+import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
 import { useState } from 'react';
-import { CopyButton } from '@/components/copy-button';
 import { cn } from '@/lib/utils';
 
 interface StepCodeTabsProps {
-  stepName: string;
-  stepId: string;
-  code: string;
   codeHtml: string;
-  usageExample: string;
   usageExampleHtml: string;
   fileName: string;
 }
 
 export function StepCodeTabs({
-  stepName,
-  stepId,
-  code,
   codeHtml,
-  usageExample,
   usageExampleHtml,
   fileName,
 }: StepCodeTabsProps) {
@@ -30,6 +22,7 @@ export function StepCodeTabs({
       <div className="border-b mb-4">
         <div className="flex gap-6">
           <button
+            type="button"
             onClick={() => setActiveTab('code')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'code'
@@ -40,6 +33,7 @@ export function StepCodeTabs({
             Code
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('usage')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'usage'
@@ -59,20 +53,18 @@ export function StepCodeTabs({
             <span className="text-muted-foreground text-xs">
               steps/{fileName}
             </span>
-            <CopyButton
-              text={code}
-              size="sm"
-              variant="ghost"
-              className="h-8 px-2"
-            />
           </div>
-          <div
-            className={cn(
-              'overflow-auto text-sm py-6 border [&_pre]:!bg-transparent'
-            )}
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: Pre-rendered safe HTML from Shiki
-            dangerouslySetInnerHTML={{ __html: codeHtml }}
-          />
+          <CodeBlock className="relative bg-fd-background rounded-md shadow-none">
+            <Pre
+              className={cn(
+                '[&_.highlighted]:!bg-primary-blue/25',
+                '[&_.highlighted]:!border-primary-blue/50',
+                '[&_.highlighted::after]:!text-muted-foreground'
+              )}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: Pre-rendered safe HTML from Shiki
+              dangerouslySetInnerHTML={{ __html: codeHtml }}
+            />
+          </CodeBlock>
         </div>
       )}
 
@@ -83,20 +75,18 @@ export function StepCodeTabs({
             <span className="text-muted-foreground text-xs">
               workflows/example.ts
             </span>
-            <CopyButton
-              text={usageExample}
-              size="sm"
-              variant="ghost"
-              className="h-8 px-2"
-            />
           </div>
-          <div
-            className={cn(
-              'overflow-auto text-sm py-6 border [&_pre]:!bg-transparent'
-            )}
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: Pre-rendered safe HTML from Shiki
-            dangerouslySetInnerHTML={{ __html: usageExampleHtml }}
-          />
+          <CodeBlock className="relative bg-fd-background rounded-md shadow-none">
+            <Pre
+              className={cn(
+                '[&_.highlighted]:!bg-primary-blue/25',
+                '[&_.highlighted]:!border-primary-blue/50',
+                '[&_.highlighted::after]:!text-muted-foreground'
+              )}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: Pre-rendered safe HTML from Shiki
+              dangerouslySetInnerHTML={{ __html: usageExampleHtml }}
+            />
+          </CodeBlock>
         </div>
       )}
     </div>

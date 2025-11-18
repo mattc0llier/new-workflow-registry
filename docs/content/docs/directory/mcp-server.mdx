@@ -1,58 +1,274 @@
 ---
 title: MCP Server
-description: Integrate the Workflow Directory with Model Context Protocol
 ---
 
-# MCP Server Integration
+# MCP Server
 
-Learn how to integrate the Workflow Directory with Model Context Protocol (MCP) servers for enhanced AI-powered workflow development.
+The Workflow Directory MCP Server allows AI assistants to interact with workflow steps from the registry. You can browse available steps, search for specific ones, and install them directly into your project using natural language.
 
-## Overview
+For example, you can ask an AI assistant to "Find me a Slack message step" or "Add the Resend email step to my project".
 
-[Content coming soon]
+---
 
-The Workflow Directory supports integration with MCP servers, allowing AI assistants to discover and recommend workflow steps based on your needs.
+## Quick Start
+
+Select your MCP client and follow the instructions to configure the Workflow Directory MCP server. If you'd like to do it manually, see the [Configuration](#configuration) section.
+
+<Tabs defaultValue="claude">
+  <TabsList>
+    <TabsTrigger value="claude">Claude Code</TabsTrigger>
+    <TabsTrigger value="cursor">Cursor</TabsTrigger>
+    <TabsTrigger value="vscode">VS Code</TabsTrigger>
+    <TabsTrigger value="codex">Codex</TabsTrigger>
+  </TabsList>
+  <TabsContent value="claude" className="mt-4">
+    **Run the following command** in your project:
+
+    ```bash
+    npx @workflow/cli mcp init --client claude
+    ```
+
+    **Restart Claude Code** and try the following prompts:
+    - Show me all available workflow steps
+    - Add the send-slack-message step to my project
+    - Find me an email sending step
+
+    **Note:** You can use `/mcp` command in Claude Code to debug the MCP server.
+
+  </TabsContent>
+
+  <TabsContent value="cursor" className="mt-4">
+    **Run the following command** in your project:
+
+    ```bash
+    npx @workflow/cli mcp init --client cursor
+    ```
+
+    Open **Cursor Settings** and **Enable the MCP server** for Workflow Directory. Then try the following prompts:
+    - Show me all available workflow steps
+    - Add the send-slack-message step to my project
+    - Find me an email sending step
+
+  </TabsContent>
+
+  <TabsContent value="vscode" className="mt-4">
+    **Run the following command** in your project:
+
+    ```bash
+    npx @workflow/cli mcp init --client vscode
+    ```
+
+    Open `.vscode/mcp.json` and click **Start** next to the Workflow Directory server. Then try the following prompts with GitHub Copilot:
+    - Show me all available workflow steps
+    - Add the send-slack-message step to my project
+    - Find me an email sending step
+
+  </TabsContent>
+
+  <TabsContent value="codex" className="mt-4">
+    <Callout className="mt-0">
+      **Note:** The Workflow CLI cannot automatically update `~/.codex/config.toml`.
+      You'll need to add the configuration manually for Codex.
+    </Callout>
+
+    **Run the following command** in your project:
+
+    ```bash
+    npx @workflow/cli mcp init --client codex
+    ```
+
+    **Then, add the following configuration** to `~/.codex/config.toml`:
+
+    ```toml
+    [mcp_servers.workflow-directory]
+    command = "npx"
+    args = ["@workflow/cli", "mcp"]
+    ```
+
+    **Restart Codex** and try the following prompts:
+    - Show me all available workflow steps
+    - Add the send-slack-message step to my project
+    - Find me an email sending step
+
+  </TabsContent>
+</Tabs>
+
+---
 
 ## What is MCP?
 
-[Content coming soon]
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io) is an open protocol that enables AI assistants to securely connect to external data sources and tools. With the Workflow Directory MCP server, your AI assistant gains direct access to:
 
-Model Context Protocol (MCP) is a standardized protocol for AI assistants to access contextual information and tools. The Workflow Directory MCP server enables AI assistants to:
+- **Browse Steps** - List all available workflow steps from the registry
+- **Search by Functionality** - Find specific steps by name, category, or integration
+- **Install with Natural Language** - Add steps using simple conversational prompts like "add a Slack notification step"
+- **View Documentation** - Access usage examples and API documentation for each step
 
-- Browse available workflow steps
-- Recommend steps based on requirements
-- Provide usage examples and documentation
-- Help with step integration
+---
 
-## Setting Up the MCP Server
+## How It Works
 
-[Content coming soon]
+The MCP server acts as a bridge between your AI assistant, the Workflow Directory registry, and your project.
 
-### Installation
+1. **Registry Connection** - MCP connects to the Workflow Directory registry
+2. **Natural Language** - You describe what step you need in plain English
+3. **AI Processing** - The assistant translates your request into registry commands
+4. **Step Installation** - Steps are fetched and installed in your project with full TypeScript types
 
-```bash
-# Install the MCP server package
-npm install @workflow/directory-mcp
+---
+
+## Configuration
+
+You can use any MCP client to interact with the Workflow Directory MCP server. Here are the instructions for the most popular ones.
+
+### Claude Code
+
+To use the Workflow Directory MCP server with Claude Code, add the following configuration to your project's `.mcp.json` file:
+
+```json title=".mcp.json" showLineNumbers
+{
+  "mcpServers": {
+    "workflow-directory": {
+      "command": "npx",
+      "args": ["@workflow/cli", "mcp"]
+    }
+  }
+}
 ```
 
-### Configuration
+After adding the configuration, restart Claude Code and run `/mcp` to see the Workflow Directory MCP server in the list. If you see `Connected`, you're good to go.
 
-[Configuration details coming soon]
+See the [Claude Code MCP documentation](https://docs.anthropic.com/en/docs/claude-code/mcp) for more details.
 
-### Usage with AI Assistants
+### Cursor
 
-[Usage examples coming soon]
+To configure MCP in Cursor, add the Workflow Directory server to your project's `.cursor/mcp.json` configuration file:
+
+```json title=".cursor/mcp.json" showLineNumbers
+{
+  "mcpServers": {
+    "workflow-directory": {
+      "command": "npx",
+      "args": ["@workflow/cli", "mcp"]
+    }
+  }
+}
+```
+
+After adding the configuration, enable the Workflow Directory MCP server in Cursor Settings.
+
+Once enabled, you should see a green dot next to the Workflow Directory server in the MCP server list and a list of available tools.
+
+See the [Cursor MCP documentation](https://docs.cursor.com/en/context/mcp#using-mcp-json) for more details.
+
+### VS Code
+
+To configure MCP in VS Code with GitHub Copilot, add the Workflow Directory server to your project's `.vscode/mcp.json` configuration file:
+
+```json title=".vscode/mcp.json" showLineNumbers
+{
+  "mcpServers": {
+    "workflow-directory": {
+      "command": "npx",
+      "args": ["@workflow/cli", "mcp"]
+    }
+  }
+}
+```
+
+After adding the configuration, open `.vscode/mcp.json` and click **Start** next to the Workflow Directory server.
+
+See the [VS Code MCP documentation](https://code.visualstudio.com/docs/copilot/chat/mcp-servers) for more details.
+
+### Codex
+
+<Callout>
+  **Note:** The Workflow CLI cannot automatically update `~/.codex/config.toml`.
+  You'll need to add the configuration manually.
+</Callout>
+
+To configure MCP in Codex, add the Workflow Directory server to `~/.codex/config.toml`:
+
+```toml title="~/.codex/config.toml" showLineNumbers
+[mcp_servers.workflow-directory]
+command = "npx"
+args = ["@workflow/cli", "mcp"]
+```
+
+After adding the configuration, restart Codex to load the MCP server.
+
+---
+
+## Example Prompts
+
+Once the MCP server is configured, you can use natural language to interact with the Workflow Directory. Try one of the following prompts:
+
+### Browse & Search
+
+- Show me all available workflow steps
+- Find me a step for sending Slack messages
+- What email sending steps are available?
+- Show me all AI-related steps
+
+### Install Steps
+
+- Add the send-slack-message step to my project
+- Install the Resend email step
+- Add an OpenAI completion step
+
+### Get Information
+
+- Show me documentation for the send-slack-message step
+- What parameters does the Resend email step accept?
+- Show me an example of using the Anthropic step
+
+### Build Workflows
+
+- Help me build a workflow that sends a Slack notification when a user signs up
+- Create a workflow that processes an image with Replicate and sends results via email
+- Build an onboarding workflow using email and database steps
+
+---
+
+## Troubleshooting
+
+### MCP Not Responding
+
+If the MCP server isn't responding to prompts:
+
+1. **Check Configuration** - Verify the MCP server is properly configured and enabled in your MCP client
+2. **Restart MCP Client** - Restart your MCP client after configuration changes
+3. **Verify Installation** - Ensure `@workflow/cli` is accessible via npx
+4. **Check Network** - Confirm you can access the Workflow Directory registry
+
+### Installation Failures
+
+If steps fail to install:
+
+1. **Check Project Setup** - Ensure you have a valid Workflow project setup
+2. **Verify Paths** - Confirm the `steps` directory exists in your project
+3. **Check Permissions** - Ensure write permissions for the steps directory
+4. **Review Dependencies** - Check that required dependencies can be installed
+
+### No Tools or Prompts
+
+If you see the `No tools or prompts` message, try the following:
+
+1. **Clear the npx cache** - Run `npx clear-npx-cache`
+2. **Re-enable the MCP server** - Try to re-enable the MCP server in your MCP client
+3. **Check Logs** - In Cursor, you can see the logs under View -> Output and select `MCP: project-*` in the dropdown.
+
+---
 
 ## Next Steps
 
 <Cards>
-    <Card href="/docs/directory/creating-steps">
-        <h3>Create Steps</h3>
-        <p>Build your own workflow steps</p>
+    <Card href="/docs/directory/get-started">
+        <h3>Get Started</h3>
+        <p>Learn the basics of using the Directory</p>
     </Card>
     <Card href="/docs/directory/contributing-steps">
         <h3>Contribute</h3>
-        <p>Share your steps via MCP</p>
+        <p>Share your steps with the community</p>
     </Card>
 </Cards>
-

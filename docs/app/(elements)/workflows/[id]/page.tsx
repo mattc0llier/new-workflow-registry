@@ -1,9 +1,10 @@
+import { ArrowDown } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { WORKFLOWS, STEPS } from '@/lib/elements-data';
-import { ArrowDown } from 'lucide-react';
+import { CodeBlock } from '@/components/ui/code-block';
+import { STEPS, WORKFLOWS } from '@/lib/elements-data';
 import { Icon } from '@/lib/icon-map';
 
 export default async function WorkflowPage({
@@ -132,9 +133,14 @@ export default async function WorkflowPage({
           {/* Complete Code */}
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-3">Complete Code</h2>
-            <pre className="not-prose bg-muted p-4 rounded-lg overflow-x-auto">
-              <code className="text-sm">{workflow.code}</code>
-            </pre>
+            <CodeBlock
+              code={workflow.code}
+              lang="ts"
+              codeblock={{
+                className:
+                  'not-prose bg-muted p-4 rounded-lg overflow-x-auto text-sm',
+              }}
+            />
           </div>
 
           {/* Installation */}

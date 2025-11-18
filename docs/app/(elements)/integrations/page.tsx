@@ -10,10 +10,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { SearchInput } from '@/components/search-input';
 import { CompanyLogo } from '@/components/company-logo';
 import { INTEGRATIONS } from '@/lib/elements-data';
-import { Search, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function IntegrationsPage() {
@@ -71,14 +70,11 @@ export default function IntegrationsPage() {
 
           {/* Search Bar */}
           <div className="mb-8">
-            <div className="relative max-w-xl">
-              <Search className="text-muted-foreground absolute left-3 top-1/2 size-5 -translate-y-1/2" />
-              <Input
-                type="text"
-                placeholder="Search for integrations..."
+            <div className="max-w-xl">
+              <SearchInput
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 h-12 text-base"
+                onChange={setSearchQuery}
+                placeholder="Search for integrations..."
               />
             </div>
           </div>

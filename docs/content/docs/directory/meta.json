@@ -1,11 +1,5 @@
 {
   "title": "Directory",
-  "pages": [
-    "get-started",
-    "installation",
-    "mcp-server",
-    "creating-steps",
-    "contributing-steps"
-  ],
+  "pages": ["get-started", "installation", "mcp-server", "contributing-steps"],
   "defaultOpen": true
 }

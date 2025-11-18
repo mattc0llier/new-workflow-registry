@@ -1,14 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { codeToHtml } from 'shiki';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { CliInstallTabs } from '@/components/cli-install-tabs';
 import { CompanyLogo } from '@/components/company-logo';
-import { CopyButton } from '@/components/copy-button';
-import { CodeBlock } from '@/components/code-block';
 import { StepCodeTabs } from '@/components/step-code-tabs';
-import { STEPS, WORKFLOWS, INTEGRATIONS } from '@/lib/elements-data';
+import { Badge } from '@/components/ui/badge';
+import { INTEGRATIONS, STEPS, WORKFLOWS } from '@/lib/elements-data';
 import { Icon } from '@/lib/icon-map';
 
 // Convert kebab-case to camelCase for function names
@@ -36,7 +33,6 @@ export default async function StepPage({
     ? WORKFLOWS.filter((w) => step.usedInWorkflows?.includes(w.id))
     : [];
 
-  const cliCommand = `npx shadcn@latest add @workflow/${step.id}`;
   const fileName = `${step.id}.tsx`;
 
   // Generate usage example
@@ -127,11 +123,7 @@ export async function myWorkflow() {
 
             {/* 4. Code and Usage Tabs */}
             <StepCodeTabs
-              stepName={step.name}
-              stepId={step.id}
-              code={step.code}
               codeHtml={codeHtml}
-              usageExample={usageExample}
               usageExampleHtml={usageExampleHtml}
               fileName={fileName}
             />
@@ -140,49 +132,17 @@ export async function myWorkflow() {
             <div className="mb-8">
               <h2 className="text-2xl font-bold mb-4">Installation</h2>
 
-              <Card className="mb-4">
-                <CardContent className="pt-6">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Run the following command to install{' '}
-                    <code className="bg-muted px-1.5 py-0.5 rounded text-xs">
-                      {fileName}
-                    </code>
-                  </p>
+              <div className="mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Run the following command to install{' '}
+                  <code className="bg-muted px-1.5 py-0.5 rounded text-xs">
+                    {fileName}
+                  </code>
+                </p>
 
-                  {/* CLI Tabs */}
-                  <div className="mb-3">
-                    <div className="flex gap-2 mb-3">
-                      <button className="px-3 py-1 text-xs font-medium bg-muted rounded">
-                        pnpm
-                      </button>
-                      <button className="px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground">
-                        npm
-                      </button>
-                      <button className="px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground">
-                        yarn
-                      </button>
-                      <button className="px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground">
-                        bun
-                      </button>
-                    </div>
-
-                    <div className="relative">
-                      <div className="absolute top-2 right-2 z-10">
-                        <CopyButton
-                          text={cliCommand}
-                          size="sm"
-                          variant="ghost"
-                        />
-                      </div>
-                      <CodeBlock
-                        code={cliCommand}
-                        lang="bash"
-                        codeblock={{ className: 'rounded-lg' }}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* CLI Tabs */}
+                <CliInstallTabs stepId={step.id} />
+              </div>
 
               {/* Environment Variables */}
               {step.envVars && step.envVars.length > 0 && (
@@ -192,23 +152,21 @@ export async function myWorkflow() {
                   </h3>
                   <div className="space-y-3">
                     {step.envVars.map((env) => (
-                      <Card key={env.name}>
-                        <CardContent className="pt-4 pb-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
-                              {env.name}
-                            </code>
-                            {env.required && (
-                              <Badge variant="destructive" className="text-xs">
-                                Required
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-muted-foreground text-sm">
-                            {env.description}
-                          </p>
-                        </CardContent>
-                      </Card>
+                      <div key={env.name} className="p-4 border rounded-lg">
+                        <div className="flex items-start justify-between mb-2">
+                          <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
+                            {env.name}
+                          </code>
+                          {env.required && (
+                            <Badge variant="destructive" className="text-xs">
+                              Required
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-muted-foreground text-sm">
+                          {env.description}
+                        </p>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -218,36 +176,36 @@ export async function myWorkflow() {
               {step.dependencies && step.dependencies.length > 0 && (
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Dependencies</h3>
-                  <Card>
-                    <CardContent className="pt-4 pb-4">
-                      <div className="flex flex-wrap gap-2">
-                        {step.dependencies.map((dep) => (
-                          <a
-                            key={dep}
-                            href={`https://www.npmjs.com/package/${dep}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm font-mono bg-muted hover:bg-muted/80 px-3 py-1.5 rounded transition-colors inline-flex items-center gap-1"
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex flex-wrap gap-2">
+                      {step.dependencies.map((dep) => (
+                        <a
+                          key={dep}
+                          href={`https://www.npmjs.com/package/${dep}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-mono bg-muted hover:bg-muted/80 px-3 py-1.5 rounded transition-colors inline-flex items-center gap-1"
+                        >
+                          {dep}
+                          <svg
+                            className="w-3 h-3 opacity-50"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-label="External link"
                           >
-                            {dep}
-                            <svg
-                              className="w-3 h-3 opacity-50"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                              />
-                            </svg>
-                          </a>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                            <title>External link</title>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -262,21 +220,19 @@ export async function myWorkflow() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   {workflows.map((workflow) => (
                     <Link key={workflow.id} href={`/workflows/${workflow.id}`}>
-                      <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-                        <CardHeader className="pb-3">
-                          <div className="flex items-start gap-3">
-                            <Icon name={workflow.icon} size={20} />
-                            <div className="flex-1">
-                              <CardTitle className="text-base mb-1">
-                                {workflow.name}
-                              </CardTitle>
-                              <p className="text-muted-foreground text-xs line-clamp-2">
-                                {workflow.description}
-                              </p>
-                            </div>
+                      <div className="p-4 border rounded-lg hover:border-primary/50 transition-colors cursor-pointer h-full">
+                        <div className="flex items-start gap-3">
+                          <Icon name={workflow.icon} size={20} />
+                          <div className="flex-1">
+                            <h4 className="text-base font-semibold mb-1">
+                              {workflow.name}
+                            </h4>
+                            <p className="text-muted-foreground text-xs line-clamp-2">
+                              {workflow.description}
+                            </p>
                           </div>
-                        </CardHeader>
-                      </Card>
+                        </div>
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -288,11 +244,9 @@ export async function myWorkflow() {
           <aside className="hidden lg:block w-80 shrink-0">
             <div className="sticky top-24 space-y-6">
               {/* Details */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <div className="p-4 border rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">Details</h3>
+                <div className="space-y-4">
                   <div>
                     <div className="text-sm text-muted-foreground mb-1">
                       Category
@@ -334,16 +288,14 @@ export async function myWorkflow() {
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
               {/* Related Steps */}
               {(relatedSteps.length > 0 || workflows.length > 0) && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Related</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
+                <div className="p-4 border rounded-lg">
+                  <h3 className="text-lg font-semibold mb-2">Related</h3>
+                  <div className="space-y-2">
                     {relatedSteps.map((relatedStep) => (
                       <Link
                         key={relatedStep.id}
@@ -366,8 +318,8 @@ export async function myWorkflow() {
                         </div>
                       </Link>
                     ))}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               )}
             </div>
           </aside>

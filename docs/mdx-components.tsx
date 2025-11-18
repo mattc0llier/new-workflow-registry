@@ -10,6 +10,13 @@ import { TypeTable } from '@/components/ui/type-table';
 import { TSDoc } from '@/lib/tsdoc';
 import { Mermaid } from './components/mermaid';
 import { Step, Steps } from './components/steps';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Tab,
+} from './components/tabs';
 import { Badge } from './components/ui/badge';
 import { cn } from './lib/cn';
 
@@ -25,6 +32,11 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     CodeBlock,
     Step,
     Steps,
+    Tabs,
+    TabsList,
+    TabsTrigger,
+    TabsContent,
+    Tab,
     Mermaid,
     ...CalloutComponents,
     h1: (props) => (

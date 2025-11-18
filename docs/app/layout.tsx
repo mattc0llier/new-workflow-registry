@@ -66,6 +66,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 url: '/integrations',
                 secondary: false,
               },
+              {
+                text: 'Builder',
+                url: 'https://workflow-builder.labs.vercel.dev/',
+                external: true,
+                secondary: false,
+              },
             ]}
           >
             {children}
