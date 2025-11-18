@@ -67,7 +67,7 @@ export async function sendSlackMessage(params: {
       },
     ],
     dependencies: ['@vercel/workflow'],
-    usedInWorkflows: ['slackbot-agent'],
+    usedInWorkflows: ['slackbot-agent', 'ai-content-pipeline'],
   },
   {
     id: 'send-email-resend',
@@ -126,7 +126,7 @@ export async function sendEmail(params: EmailParams) {
       },
     ],
     dependencies: ['@vercel/workflow'],
-    usedInWorkflows: ['user-onboarding'],
+    usedInWorkflows: ['user-onboarding', 'ai-content-pipeline'],
   },
   {
     id: 'openai-chat',
@@ -181,7 +181,11 @@ export async function openaiChat(params: ChatParams) {
       },
     ],
     dependencies: ['@vercel/workflow'],
-    usedInWorkflows: ['slackbot-agent', 'content-generator'],
+    usedInWorkflows: [
+      'slackbot-agent',
+      'content-generator',
+      'ai-content-pipeline',
+    ],
   },
   {
     id: 'anthropic-claude',
@@ -237,7 +241,7 @@ export async function anthropicClaude(params: ClaudeParams) {
       },
     ],
     dependencies: ['@vercel/workflow'],
-    usedInWorkflows: ['content-generator'],
+    usedInWorkflows: ['content-generator', 'ai-content-pipeline'],
   },
   {
     id: 'replicate-model',
@@ -316,7 +320,7 @@ export async function replicateModel(params: ReplicateParams) {
       },
     ],
     dependencies: ['@vercel/workflow'],
-    usedInWorkflows: ['image-generation'],
+    usedInWorkflows: ['image-generation', 'ai-content-pipeline'],
   },
   {
     id: 'google-gemini',
@@ -1322,6 +1326,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://api.slack.com/docs',
     steps: ['send-slack-message'],
     authType: 'OAuth',
+    category: 'Communication',
     setupInstructions: `1. Create a Slack App at https://api.slack.com/apps
 2. Add the chat:write scope to your bot token
 3. Install the app to your workspace
@@ -1339,6 +1344,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://resend.com/docs',
     steps: ['send-email-resend'],
     authType: 'API Key',
+    category: 'Communication',
     setupInstructions: `1. Sign up at https://resend.com
 2. Create an API key in your dashboard
 3. Verify your sending domain
@@ -1354,6 +1360,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://platform.openai.com/docs',
     steps: ['openai-chat'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://platform.openai.com
 2. Create an API key in your account settings
 3. Add billing information
@@ -1370,6 +1377,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://docs.anthropic.com',
     steps: ['anthropic-claude'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://console.anthropic.com
 2. Create an API key in your account settings
 3. Add the API key as ANTHROPIC_API_KEY to your environment variables`,
@@ -1385,6 +1393,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://replicate.com/docs',
     steps: ['replicate-model'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://replicate.com
 2. Get your API token from your account settings
 3. Add the token as REPLICATE_API_TOKEN to your environment variables`,
@@ -1399,6 +1408,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://ai.google.dev/docs',
     steps: ['google-gemini'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Visit https://makersuite.google.com/app/apikey
 2. Create an API key
 3. Add the key as GOOGLE_AI_API_KEY to your environment variables`,
@@ -1414,6 +1424,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://huggingface.co/docs/api-inference',
     steps: ['huggingface-inference'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://huggingface.co
 2. Create an access token in your settings
 3. Add the token as HUGGINGFACE_API_TOKEN to your environment variables`,
@@ -1428,6 +1439,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://docs.cohere.com',
     steps: ['cohere-generate'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://dashboard.cohere.com
 2. Create an API key
 3. Add the key as COHERE_API_KEY to your environment variables`,
@@ -1443,6 +1455,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://elevenlabs.io/docs',
     steps: ['elevenlabs-tts'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://elevenlabs.io
 2. Get your API key from your profile
 3. Add the key as ELEVENLABS_API_KEY to your environment variables`,
@@ -1458,6 +1471,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://platform.stability.ai/docs',
     steps: ['stability-ai-image'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://platform.stability.ai
 2. Create an API key in your account
 3. Add the key as STABILITY_API_KEY to your environment variables`,
@@ -1472,6 +1486,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://docs.mistral.ai',
     steps: ['mistral-ai'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://console.mistral.ai
 2. Create an API key
 3. Add the key as MISTRAL_API_KEY to your environment variables`,
@@ -1486,6 +1501,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://docs.perplexity.ai',
     steps: ['perplexity-ai'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://perplexity.ai
 2. Get your API key from settings
 3. Add the key as PERPLEXITY_API_KEY to your environment variables`,
@@ -1500,6 +1516,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://docs.together.ai',
     steps: ['together-ai'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://api.together.xyz
 2. Create an API key
 3. Add the key as TOGETHER_API_KEY to your environment variables`,
@@ -1514,6 +1531,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://docs.runpod.io',
     steps: ['runpod-inference'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://runpod.io
 2. Get your API key from settings
 3. Create a serverless endpoint
@@ -1529,6 +1547,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://developers.deepgram.com/docs',
     steps: ['deepgram-transcribe'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://console.deepgram.com
 2. Create an API key
 3. Add the key as DEEPGRAM_API_KEY to your environment variables`,
@@ -1543,6 +1562,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://www.assemblyai.com/docs',
     steps: ['assemblyai-transcribe'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://www.assemblyai.com
 2. Get your API key from the dashboard
 3. Add the key as ASSEMBLYAI_API_KEY to your environment variables`,
@@ -1557,6 +1577,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://docs.fireworks.ai',
     steps: ['fireworks-ai'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://fireworks.ai
 2. Create an API key
 3. Add the key as FIREWORKS_API_KEY to your environment variables`,
@@ -1571,6 +1592,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://openrouter.ai/docs',
     steps: ['openrouter-ai'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://openrouter.ai
 2. Create an API key
 3. Add the key as OPENROUTER_API_KEY to your environment variables`,
@@ -1585,6 +1607,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://docs.leonardo.ai',
     steps: ['leonardo-ai'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://app.leonardo.ai
 2. Get your API key from settings
 3. Add the key as LEONARDO_API_KEY to your environment variables`,
@@ -1599,6 +1622,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://console.groq.com/docs',
     steps: ['groq-inference'],
     authType: 'API Key',
+    category: 'AI',
     setupInstructions: `1. Sign up at https://console.groq.com
 2. Create an API key
 3. Add the key as GROQ_API_KEY to your environment variables`,
@@ -1613,6 +1637,7 @@ export const INTEGRATIONS: Integration[] = [
     docsUrl: 'https://stripe.com/docs/api',
     steps: ['stripe-payment'],
     authType: 'API Key',
+    category: 'Payment',
     setupInstructions: `1. Sign up at https://stripe.com
 2. Get your API keys from the dashboard
 3. Add STRIPE_SECRET_KEY to your environment variables
@@ -1642,8 +1667,8 @@ export const WORKFLOWS: Workflow[] = [
       },
     ],
     code: `import { workflow } from '@vercel/workflow';
-import { openaiChat } from './steps/openai-chat';
-import { sendSlackMessage } from './steps/send-slack-message';
+import { openaiChat } from '@/steps/openai-chat';
+import { sendSlackMessage } from '@/steps/send-slack-message';
 
 type SlackbotParams = {
   channel: string;
@@ -1696,7 +1721,7 @@ export const slackbotAgent = workflow(
       },
     ],
     code: `import { workflow } from '@vercel/workflow';
-import { sendEmail } from './steps/send-email-resend';
+import { sendEmail } from '@/steps/send-email-resend';
 
 type OnboardingParams = {
   email: string;
@@ -1744,8 +1769,8 @@ export const userOnboarding = workflow(
       },
     ],
     code: `import { workflow } from '@vercel/workflow';
-import { stripePayment } from './steps/stripe-payment';
-import { sendEmail } from './steps/send-email-resend';
+import { stripePayment } from '@/steps/stripe-payment';
+import { sendEmail } from '@/steps/send-email-resend';
 
 type PaymentParams = {
   amount: number;
@@ -1781,5 +1806,141 @@ export const paymentProcessing = workflow(
     useCase:
       'Process customer payments and send confirmation emails automatically.',
     prerequisites: ['Stripe API key', 'Resend API key'],
+  },
+  {
+    id: 'ai-content-pipeline',
+    name: 'AI Content Generation Pipeline',
+    description:
+      'Generate blog content with AI, create a cover image, and distribute via email',
+    icon: 'Workflow',
+    category: 'AI Agents',
+    difficulty: 'Advanced',
+    steps: [
+      {
+        stepId: 'anthropic-claude',
+        order: 1,
+        description: 'Generate high-quality blog content using Claude AI',
+      },
+      {
+        stepId: 'openai-chat',
+        order: 2,
+        description: 'Create an engaging image prompt from the content',
+      },
+      {
+        stepId: 'replicate-model',
+        order: 3,
+        description: 'Generate a cover image using Stable Diffusion',
+      },
+      {
+        stepId: 'send-email-resend',
+        order: 4,
+        description: 'Send the completed article to subscribers',
+      },
+      {
+        stepId: 'send-slack-message',
+        order: 5,
+        description: 'Notify the team about the published content',
+      },
+    ],
+    code: `import { workflow } from '@vercel/workflow';
+import { anthropicClaude } from '@/steps/anthropic-claude';
+import { openaiChat } from '@/steps/openai-chat';
+import { replicateModel } from '@/steps/replicate-model';
+import { sendEmail } from '@/steps/send-email-resend';
+import { sendSlackMessage } from '@/steps/send-slack-message';
+
+type ContentPipelineParams = {
+  topic: string;
+  targetAudience: string;
+  tone: 'professional' | 'casual' | 'technical';
+  subscriberEmails: string[];
+  slackChannel: string;
+};
+
+export const aiContentPipeline = workflow(
+  'ai-content-pipeline',
+  async (params: ContentPipelineParams) => {
+    "use workflow";
+
+    // Step 1: Generate blog content with Claude
+    const articlePrompt = \`Write a comprehensive blog post about "\${params.topic}"
+for \${params.targetAudience}. Use a \${params.tone} tone.
+Include an engaging introduction, main points with examples, and a conclusion.
+Format in markdown with proper headings.\`;
+
+    const article = await anthropicClaude({
+      messages: [
+        {
+          role: 'user',
+          content: articlePrompt,
+        },
+      ],
+      model: 'claude-3-5-sonnet-20241022',
+      maxTokens: 2000,
+    });
+
+    // Step 2: Create image prompt from content
+    const imagePromptRequest = await openaiChat({
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert at creating detailed image generation prompts.',
+        },
+        {
+          role: 'user',
+          content: \`Based on this blog post, create a detailed Stable Diffusion prompt for a professional cover image. The prompt should be visual and specific: \${article.slice(0, 500)}\`,
+        },
+      ],
+      model: 'gpt-4',
+    });
+
+    // Step 3: Generate cover image
+    const coverImage = await replicateModel({
+      model: 'stability-ai/stable-diffusion',
+      input: {
+        prompt: imagePromptRequest,
+        width: 1024,
+        height: 768,
+      },
+    });
+
+    // Step 4: Send to subscribers
+    const emailPromises = params.subscriberEmails.map((email) =>
+      sendEmail({
+        to: email,
+        subject: \`New Article: \${params.topic}\`,
+        html: \`
+          <h1>New Content Alert!</h1>
+          <img src="\${coverImage.url}" alt="Cover image" style="max-width: 100%; height: auto;">
+          <div>\${article}</div>
+        \`,
+      })
+    );
+
+    await Promise.all(emailPromises);
+
+    // Step 5: Notify team on Slack
+    await sendSlackMessage({
+      channel: params.slackChannel,
+      text: \`📝 New blog post published: "\${params.topic}"\\n✅ Sent to \${params.subscriberEmails.length} subscribers\\n🎨 Cover image: \${coverImage.url}\`,
+    });
+
+    return {
+      success: true,
+      article,
+      coverImage: coverImage.url,
+      emailsSent: params.subscriberEmails.length,
+    };
+  }
+);`,
+    useCase:
+      'Automate your entire content creation and distribution process. Generate high-quality blog posts, create matching cover images, and distribute to your audience - all with AI.',
+    prerequisites: [
+      'Anthropic API key',
+      'OpenAI API key',
+      'Replicate API token',
+      'Resend API key',
+      'Slack Bot token with chat:write scope',
+    ],
   },
 ];

@@ -16,16 +16,6 @@ import { INTEGRATIONS } from '@/lib/elements-data';
 import { Search, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const CATEGORIES = [
-  { id: 'all', name: 'All categories', count: 0 },
-  { id: 'Core', name: 'Core', count: 0 },
-  { id: 'AI', name: 'AI', count: 0 },
-  { id: 'Data', name: 'Data', count: 0 },
-  { id: 'Communication', name: 'Communication', count: 0 },
-  { id: 'Payment', name: 'Payment', count: 0 },
-  { id: 'Storage', name: 'Storage', count: 0 },
-];
-
 export default function IntegrationsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -35,10 +25,34 @@ export default function IntegrationsPage() {
       integration.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       integration.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory = selectedCategory === 'all' || !selectedCategory;
+    const matchesCategory =
+      selectedCategory === 'all' || integration.category === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
+
+  // Calculate category counts
+  const categoryCounts = INTEGRATIONS.reduce(
+    (acc, integration) => {
+      acc[integration.category] = (acc[integration.category] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  const categories = [
+    { id: 'all', name: 'All categories', count: INTEGRATIONS.length },
+    { id: 'Core', name: 'Core', count: categoryCounts['Core'] || 0 },
+    { id: 'AI', name: 'AI', count: categoryCounts['AI'] || 0 },
+    { id: 'Data', name: 'Data', count: categoryCounts['Data'] || 0 },
+    {
+      id: 'Communication',
+      name: 'Communication',
+      count: categoryCounts['Communication'] || 0,
+    },
+    { id: 'Payment', name: 'Payment', count: categoryCounts['Payment'] || 0 },
+    { id: 'Storage', name: 'Storage', count: categoryCounts['Storage'] || 0 },
+  ];
 
   return (
     <main className="flex w-full min-w-0 flex-col">
@@ -76,7 +90,7 @@ export default function IntegrationsPage() {
                 <div className="mb-6">
                   <h3 className="mb-3 text-sm font-semibold">Categories</h3>
                   <div className="space-y-1">
-                    {CATEGORIES.map((category) => (
+                    {categories.map((category) => (
                       <button
                         key={category.id}
                         onClick={() => setSelectedCategory(category.id)}
@@ -97,6 +111,9 @@ export default function IntegrationsPage() {
                         />
                         <span className="flex-1 text-left">
                           {category.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {category.count}
                         </span>
                       </button>
                     ))}
@@ -141,10 +158,15 @@ export default function IntegrationsPage() {
                           {integration.description}
                         </CardDescription>
                         <div className="mt-4 flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground">
-                            {integration.steps.length} step
-                            {integration.steps.length !== 1 ? 's' : ''}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {integration.category}
+                            </Badge>
+                            <span className="text-muted-foreground">
+                              {integration.steps.length} step
+                              {integration.steps.length !== 1 ? 's' : ''}
+                            </span>
+                          </div>
                           {integration.authType && (
                             <Badge variant="outline" className="text-xs">
                               {integration.authType}

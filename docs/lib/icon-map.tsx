@@ -22,6 +22,7 @@ import {
   CreditCard,
   UserPlus,
   DollarSign,
+  Workflow,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -50,6 +51,7 @@ export const iconMap: Record<string, LucideIcon> = {
   CreditCard,
   UserPlus,
   DollarSign,
+  Workflow,
 };
 
 // Helper component to render an icon by name

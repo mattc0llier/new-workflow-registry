@@ -29,6 +29,7 @@ export type Integration = {
   steps: string[]; // Array of step IDs
   setupInstructions?: string;
   authType?: 'API Key' | 'OAuth' | 'Basic Auth' | 'None';
+  category: 'Core' | 'AI' | 'Data' | 'Communication' | 'Payment' | 'Storage';
 };
 
 export type Workflow = {
