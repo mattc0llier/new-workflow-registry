@@ -57,13 +57,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 secondary: false,
               },
               {
-                text: 'Integrations',
-                url: '/integrations',
+                text: 'Workflows',
+                url: '/workflows',
                 secondary: false,
               },
               {
-                text: 'Workflows',
-                url: '/workflows',
+                text: 'Integrations',
+                url: '/integrations',
                 secondary: false,
               },
             ]}
