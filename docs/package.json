@@ -8,7 +8,7 @@
     "dev": "next dev --turbo",
     "start": "next start",
     "postinstall": "fumadocs-mdx",
-    "postbuild": "node scripts/pack.ts",
+    "postbuild": "bun scripts/pack.ts && node scripts/build-registry.js",
     "lint": "biome check && bun scripts/lint.ts",
     "lint:links": "bun scripts/lint.ts",
     "format": "biome format --write",
