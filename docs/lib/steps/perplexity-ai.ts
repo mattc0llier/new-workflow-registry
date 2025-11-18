@@ -1,4 +1,11 @@
+import fs from 'fs';
+import path from 'path';
 import type { Step } from '../elements-types';
+
+const code = fs.readFileSync(
+  path.join(__dirname, '../step-implementations/perplexity-ai.ts'),
+  'utf-8'
+);
 
 export const perplexityAI: Step = {
   id: 'perplexity-ai',
@@ -8,41 +15,7 @@ export const perplexityAI: Step = {
   category: 'AI',
   integration: 'perplexity',
   tags: ['ai', 'perplexity', 'search', 'llm'],
-  code: `import { fatalError } from '@vercel/workflow';
-
-type PerplexityParams = {
-  messages: { role: string; content: string }[];
-  model?: string;
-};
-
-export async function perplexityAI(params: PerplexityParams) {
-  "use step";
-
-  const apiKey = process.env.PERPLEXITY_API_KEY;
-
-    if (!apiKey) {
-      throw fatalError('PERPLEXITY_API_KEY is required');
-    }
-
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': \`Bearer \${apiKey}\`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: params.model || 'llama-3.1-sonar-large-128k-online',
-        messages: params.messages,
-      }),
-    });
-
-    if (!response.ok) {
-      throw fatalError(\`Perplexity API error: \${response.status}\`);
-    }
-
-    const data = await response.json();
-    return data.choices[0].message.content;
-}`,
+  code,
   envVars: [
     {
       name: 'PERPLEXITY_API_KEY',

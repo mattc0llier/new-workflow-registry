@@ -3,11 +3,11 @@ const path = require('path');
 
 // Import the steps data from the compiled structure
 // Since this is a Node script, we need to dynamically import the TypeScript
-const stepsDir = path.join(process.cwd(), 'lib', 'steps');
+const stepsDir = path.join(process.cwd(), 'lib', 'step-implementations');
 
 console.log('🔨 Building workflow registry...\n');
 
-// Read all step files from the steps directory
+// Read all step files from the step-implementations directory
 const stepFiles = fs
   .readdirSync(stepsDir)
   .filter((file) => file.endsWith('.ts') && file !== 'index.ts');
@@ -23,26 +23,27 @@ const registryItems = [];
 // For each step file, extract key information
 stepFiles.forEach((file) => {
   const stepPath = path.join(stepsDir, file);
-  const stepContent = fs.readFileSync(stepPath, 'utf8');
+  const stepContent = fs.readFileSync(stepPath, 'utf-8');
 
-  // Extract id
-  const idMatch = stepContent.match(/id: '([^']+)'/);
-  const nameMatch = stepContent.match(/name: '([^']+)'/);
-  const descMatch = stepContent.match(/description:\s*'([^']+)'/);
-  const codeMatch = stepContent.match(
-    /code: `([\s\S]*?)`(?=,\s*(?:envVars|dependencies))/
-  );
-  const depsMatch = stepContent.match(/dependencies: \[([\s\S]*?)\]/);
+  // Extract the step ID from the filename
+  const id = file.replace('.ts', '');
 
-  if (!idMatch || !nameMatch || !descMatch || !codeMatch) {
+  // Read the metadata from the steps directory
+  const metadataPath = path.join(process.cwd(), 'lib', 'steps', file);
+  const metadataContent = fs.readFileSync(metadataPath, 'utf-8');
+
+  // Extract metadata fields
+  const nameMatch = metadataContent.match(/name: '([^']+)'/);
+  const descMatch = metadataContent.match(/description:\s*'([^']+)'/);
+  const depsMatch = metadataContent.match(/dependencies: \[([\s\S]*?)\]/);
+
+  if (!nameMatch || !descMatch) {
     console.log(`⚠️  Skipping ${file} - missing required fields`);
     return;
   }
 
-  const id = idMatch[1];
   const name = nameMatch[1];
   const description = descMatch[1];
-  const code = codeMatch[1];
 
   // Extract dependencies
   let dependencies = [];
@@ -66,7 +67,7 @@ stepFiles.forEach((file) => {
       {
         path: `registry/steps/${id}.tsx`,
         type: 'registry:component',
-        content: code,
+        content: stepContent,
         target: `components/steps/${id}.tsx`,
       },
     ],

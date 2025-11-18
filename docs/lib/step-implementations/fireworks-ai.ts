@@ -1,0 +1,39 @@
+import { fatalError } from '@vercel/workflow';
+
+type FireworksParams = {
+  messages: { role: string; content: string }[];
+  model?: string;
+};
+
+export async function fireworksAI(params: FireworksParams) {
+  'use step';
+
+  const apiKey = process.env.FIREWORKS_API_KEY;
+
+  if (!apiKey) {
+    throw fatalError('FIREWORKS_API_KEY is required');
+  }
+
+  const response = await fetch(
+    'https://api.fireworks.ai/inference/v1/chat/completions',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model:
+          params.model || 'accounts/fireworks/models/llama-v3p1-70b-instruct',
+        messages: params.messages,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    throw fatalError(`Fireworks API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}

@@ -1,24 +1,24 @@
-import { slack } from './slack';
-import { resend } from './resend';
-import { openai } from './openai';
 import { anthropic } from './anthropic';
-import { replicate } from './replicate';
-import { googleAI } from './google-ai';
-import { huggingface } from './huggingface';
-import { cohere } from './cohere';
-import { elevenlabs } from './elevenlabs';
-import { stabilityAI } from './stability-ai';
-import { mistral } from './mistral';
-import { perplexity } from './perplexity';
-import { together } from './together';
-import { runpod } from './runpod';
-import { deepgram } from './deepgram';
 import { assemblyai } from './assemblyai';
+import { cohere } from './cohere';
+import { deepgram } from './deepgram';
+import { elevenlabs } from './elevenlabs';
 import { fireworks } from './fireworks';
-import { openrouter } from './openrouter';
-import { leonardo } from './leonardo';
+import { googleAI } from './google-ai';
 import { groq } from './groq';
+import { huggingface } from './huggingface';
+import { leonardo } from './leonardo';
+import { mistral } from './mistral';
+import { openai } from './openai';
+import { openrouter } from './openrouter';
+import { perplexity } from './perplexity';
+import { replicate } from './replicate';
+import { resend } from './resend';
+import { runpod } from './runpod';
+import { slack } from './slack';
+import { stabilityAI } from './stability-ai';
 import { stripe } from './stripe';
+import { together } from './together';
 
 export const INTEGRATIONS = [
   slack,

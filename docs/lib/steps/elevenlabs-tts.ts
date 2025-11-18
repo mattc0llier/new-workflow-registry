@@ -1,4 +1,11 @@
+import fs from 'fs';
+import path from 'path';
 import type { Step } from '../elements-types';
+
+const code = fs.readFileSync(
+  path.join(__dirname, '../step-implementations/elevenlabs-tts.ts'),
+  'utf-8'
+);
 
 export const elevenlabsTTS: Step = {
   id: 'elevenlabs-tts',
@@ -8,60 +15,7 @@ export const elevenlabsTTS: Step = {
   category: 'AI',
   integration: 'elevenlabs',
   tags: ['ai', 'elevenlabs', 'tts', 'voice', 'audio'],
-  code: `import { fatalError } from '@vercel/workflow';
-
-type ElevenLabsParams = {
-  text: string;
-  voice_id?: string;
-  model_id?: string;
-  voice_settings?: {
-    stability: number;
-    similarity_boost: number;
-  };
-};
-
-export async function elevenlabsTTS(params: ElevenLabsParams) {
-  "use step";
-
-  const apiKey = process.env.ELEVENLABS_API_KEY;
-
-    if (!apiKey) {
-      throw fatalError('ELEVENLABS_API_KEY is required');
-    }
-
-    const voiceId = params.voice_id || '21m00Tcm4TlvDq8ikWAM'; // Default voice
-    const response = await fetch(
-      \`https://api.elevenlabs.io/v1/text-to-speech/\${voiceId}\`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': apiKey,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: params.text,
-          model_id: params.model_id || 'eleven_monolingual_v1',
-          voice_settings: params.voice_settings || {
-            stability: 0.5,
-            similarity_boost: 0.75,
-          },
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      throw fatalError(\`ElevenLabs API error: \${response.status}\`);
-    }
-
-    // Return audio as base64
-    const audioBuffer = await response.arrayBuffer();
-    const base64Audio = Buffer.from(audioBuffer).toString('base64');
-
-    return {
-      audio: base64Audio,
-      contentType: response.headers.get('content-type'),
-    };
-}`,
+  code,
   envVars: [
     {
       name: 'ELEVENLABS_API_KEY',
