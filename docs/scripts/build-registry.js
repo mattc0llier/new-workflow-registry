@@ -36,7 +36,9 @@ stepMatches.forEach((match, index) => {
   const idMatch = stepText.match(/id: '([^']+)'/);
   const nameMatch = stepText.match(/name: '([^']+)'/);
   const descMatch = stepText.match(/description:\s*'([^']+)'/);
-  const codeMatch = stepText.match(/code: `([\s\S]*?)`,/);
+  const codeMatch = stepText.match(
+    /code: `([\s\S]*?)`(?=,\s*(?:envVars|dependencies))/
+  );
   const depsMatch = stepText.match(/dependencies: \[([\s\S]*?)\]/);
 
   if (!idMatch || !nameMatch || !descMatch || !codeMatch) {
