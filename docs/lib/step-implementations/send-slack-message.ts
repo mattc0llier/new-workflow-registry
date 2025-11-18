@@ -1,15 +1,18 @@
-// Step function - does the actual API work
-async function sendSlackMessageStep(params: {
+import { fatalError } from '@vercel/workflow';
+
+type SlackMessageParams = {
   channel: string;
   text: string;
   blocks?: any[];
-}) {
+};
+
+export async function sendSlackMessage(params: SlackMessageParams) {
   'use step';
 
   const token = process.env.SLACK_BOT_TOKEN;
 
   if (!token) {
-    throw new Error('SLACK_BOT_TOKEN is required');
+    throw fatalError('SLACK_BOT_TOKEN is required');
   }
 
   const response = await fetch('https://slack.com/api/chat.postMessage', {
@@ -24,25 +27,12 @@ async function sendSlackMessageStep(params: {
   const data = await response.json();
 
   if (!data.ok) {
-    throw new Error(`Slack API error: ${data.error}`);
+    throw fatalError(`Slack API error: ${data.error}`);
   }
-
-  return data;
-}
-
-// Workflow function - orchestrates the step
-export async function sendSlackMessage(params: {
-  channel: string;
-  text: string;
-  blocks?: any[];
-}) {
-  'use workflow';
-
-  const result = await sendSlackMessageStep(params);
 
   return {
     success: true,
-    messageTs: result.ts,
-    channel: result.channel,
+    messageTs: data.ts,
+    channel: data.channel,
   };
 }
