@@ -1,12 +1,19 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { codeToHtml } from 'shiki';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CompanyLogo } from '@/components/company-logo';
 import { CopyButton } from '@/components/copy-button';
 import { CodeBlock } from '@/components/code-block';
+import { StepCodeTabs } from '@/components/step-code-tabs';
 import { STEPS, WORKFLOWS, INTEGRATIONS } from '@/lib/elements-data';
+
+// Convert kebab-case to camelCase for function names
+function toCamelCase(str: string): string {
+  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+}
 
 export default async function StepPage({
   params,
@@ -30,6 +37,40 @@ export default async function StepPage({
 
   const cliCommand = `npx shadcn@latest add @workflow/${step.id}`;
   const fileName = `${step.id}.tsx`;
+
+  // Generate usage example
+  const functionName = toCamelCase(step.id);
+  const usageExample = `import { ${functionName} } from '@/steps/${step.id}';
+
+export async function myWorkflow() {
+  "use workflow";
+
+  // Call the step - will automatically retry on transient failures
+  const result = await ${functionName}({
+    // Add your parameters here
+  });
+
+  return result;
+}`;
+
+  // Pre-render code blocks with Shiki (server-side)
+  const codeHtml = await codeToHtml(step.code, {
+    lang: 'typescript',
+    themes: {
+      light: 'github-light-default',
+      dark: 'github-dark-default',
+    },
+    defaultColor: false,
+  });
+
+  const usageExampleHtml = await codeToHtml(usageExample, {
+    lang: 'typescript',
+    themes: {
+      light: 'github-light-default',
+      dark: 'github-dark-default',
+    },
+    defaultColor: false,
+  });
 
   // Related steps from the same integration
   const relatedSteps = integration
@@ -84,34 +125,15 @@ export default async function StepPage({
             )}
 
             {/* 4. Code and Usage Tabs */}
-            <div className="mb-8">
-              <div className="border-b mb-4">
-                <div className="flex gap-6">
-                  <button className="pb-3 px-1 border-b-2 border-foreground font-medium text-sm">
-                    Code
-                  </button>
-                  <button className="pb-3 px-1 text-muted-foreground hover:text-foreground font-medium text-sm">
-                    Usage
-                  </button>
-                </div>
-              </div>
-
-              {/* Code Section */}
-              <div className="relative">
-                <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-                  <span className="text-muted-foreground text-xs">
-                    {fileName}
-                  </span>
-                  <CopyButton
-                    text={step.code}
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 px-2"
-                  />
-                </div>
-                <CodeBlock code={step.code} lang="typescript" />
-              </div>
-            </div>
+            <StepCodeTabs
+              stepName={step.name}
+              stepId={step.id}
+              code={step.code}
+              codeHtml={codeHtml}
+              usageExample={usageExample}
+              usageExampleHtml={usageExampleHtml}
+              fileName={fileName}
+            />
 
             {/* 5. Installation Section */}
             <div className="mb-8">
@@ -197,9 +219,32 @@ export default async function StepPage({
                   <h3 className="text-lg font-semibold mb-3">Dependencies</h3>
                   <Card>
                     <CardContent className="pt-4 pb-4">
-                      <code className="text-sm font-mono">
-                        {step.dependencies.join(', ')}
-                      </code>
+                      <div className="flex flex-wrap gap-2">
+                        {step.dependencies.map((dep) => (
+                          <a
+                            key={dep}
+                            href={`https://www.npmjs.com/package/${dep}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-mono bg-muted hover:bg-muted/80 px-3 py-1.5 rounded transition-colors inline-flex items-center gap-1"
+                          >
+                            {dep}
+                            <svg
+                              className="w-3 h-3 opacity-50"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                          </a>
+                        ))}
+                      </div>
                     </CardContent>
                   </Card>
                 </div>

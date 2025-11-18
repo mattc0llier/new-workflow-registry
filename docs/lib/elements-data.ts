@@ -77,9 +77,7 @@ export async function sendSlackMessage(params: {
     category: 'Communication',
     integration: 'resend',
     tags: ['email', 'resend', 'notifications'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type EmailParams = {
   to: string;
@@ -88,10 +86,10 @@ type EmailParams = {
   from?: string;
 };
 
-export const sendEmail = workflow(
-  'send-email-resend',
-  async (params: EmailParams) => {
-    const apiKey = process.env.RESEND_API_KEY;
+export async function sendEmail(params: EmailParams) {
+  "use step";
+
+  const apiKey = process.env.RESEND_API_KEY;
 
     if (!apiKey) {
       throw fatalError('RESEND_API_KEY is required');
@@ -114,8 +112,7 @@ export const sendEmail = workflow(
     }
 
     return await response.json();
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'RESEND_API_KEY',
@@ -139,9 +136,7 @@ export const sendEmail = workflow(
     category: 'AI',
     integration: 'openai',
     tags: ['ai', 'openai', 'gpt', 'llm'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type ChatParams = {
   messages: { role: string; content: string }[];
@@ -149,10 +144,10 @@ type ChatParams = {
   temperature?: number;
 };
 
-export const openaiChat = workflow(
-  'openai-chat',
-  async (params: ChatParams) => {
-    const apiKey = process.env.OPENAI_API_KEY;
+export async function openaiChat(params: ChatParams) {
+  "use step";
+
+  const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
       throw fatalError('OPENAI_API_KEY is required');
@@ -177,8 +172,7 @@ export const openaiChat = workflow(
 
     const data = await response.json();
     return data.choices[0].message.content;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'OPENAI_API_KEY',
@@ -197,9 +191,7 @@ export const openaiChat = workflow(
     category: 'AI',
     integration: 'anthropic',
     tags: ['ai', 'anthropic', 'claude', 'llm'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type ClaudeParams = {
   messages: { role: string; content: string }[];
@@ -207,10 +199,10 @@ type ClaudeParams = {
   max_tokens?: number;
 };
 
-export const anthropicClaude = workflow(
-  'anthropic-claude',
-  async (params: ClaudeParams) => {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+export async function anthropicClaude(params: ClaudeParams) {
+  "use step";
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
       throw fatalError('ANTHROPIC_API_KEY is required');
@@ -236,8 +228,7 @@ export const anthropicClaude = workflow(
 
     const data = await response.json();
     return data.content[0].text;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'ANTHROPIC_API_KEY',
@@ -257,9 +248,7 @@ export const anthropicClaude = workflow(
     category: 'AI',
     integration: 'replicate',
     tags: ['ai', 'replicate', 'image-generation', 'ml'],
-    code: `'use workflow';
-
-import { workflow, fatalError, retryableError } from '@vercel/workflow';
+    code: `import { fatalError, retryableError } from '@vercel/workflow';
 
 type ReplicateParams = {
   model: string;
@@ -267,10 +256,10 @@ type ReplicateParams = {
   webhook?: string;
 };
 
-export const replicateModel = workflow(
-  'replicate-model',
-  async (params: ReplicateParams) => {
-    const apiKey = process.env.REPLICATE_API_TOKEN;
+export async function replicateModel(params: ReplicateParams) {
+  "use step";
+
+  const apiKey = process.env.REPLICATE_API_TOKEN;
 
     if (!apiKey) {
       throw fatalError('REPLICATE_API_TOKEN is required');
@@ -318,8 +307,7 @@ export const replicateModel = workflow(
     }
 
     return result.output;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'REPLICATE_API_TOKEN',
@@ -338,9 +326,7 @@ export const replicateModel = workflow(
     category: 'AI',
     integration: 'google-ai',
     tags: ['ai', 'google', 'gemini', 'llm'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type GeminiParams = {
   prompt: string;
@@ -348,10 +334,10 @@ type GeminiParams = {
   temperature?: number;
 };
 
-export const googleGemini = workflow(
-  'google-gemini',
-  async (params: GeminiParams) => {
-    const apiKey = process.env.GOOGLE_AI_API_KEY;
+export async function googleGemini(params: GeminiParams) {
+  "use step";
+
+  const apiKey = process.env.GOOGLE_AI_API_KEY;
 
     if (!apiKey) {
       throw fatalError('GOOGLE_AI_API_KEY is required');
@@ -382,8 +368,7 @@ export const googleGemini = workflow(
 
     const data = await response.json();
     return data.candidates[0].content.parts[0].text;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'GOOGLE_AI_API_KEY',
@@ -402,9 +387,7 @@ export const googleGemini = workflow(
     category: 'AI',
     integration: 'huggingface',
     tags: ['ai', 'huggingface', 'ml', 'transformers'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type HuggingFaceParams = {
   model: string;
@@ -412,10 +395,10 @@ type HuggingFaceParams = {
   parameters?: Record<string, any>;
 };
 
-export const huggingfaceInference = workflow(
-  'huggingface-inference',
-  async (params: HuggingFaceParams) => {
-    const apiKey = process.env.HUGGINGFACE_API_TOKEN;
+export async function huggingfaceInference(params: HuggingFaceParams) {
+  "use step";
+
+  const apiKey = process.env.HUGGINGFACE_API_TOKEN;
 
     if (!apiKey) {
       throw fatalError('HUGGINGFACE_API_TOKEN is required');
@@ -441,8 +424,7 @@ export const huggingfaceInference = workflow(
     }
 
     return await response.json();
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'HUGGINGFACE_API_TOKEN',
@@ -460,9 +442,7 @@ export const huggingfaceInference = workflow(
     category: 'AI',
     integration: 'cohere',
     tags: ['ai', 'cohere', 'llm', 'text-generation'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type CohereParams = {
   prompt: string;
@@ -471,10 +451,10 @@ type CohereParams = {
   temperature?: number;
 };
 
-export const cohereGenerate = workflow(
-  'cohere-generate',
-  async (params: CohereParams) => {
-    const apiKey = process.env.COHERE_API_KEY;
+export async function cohereGenerate(params: CohereParams) {
+  "use step";
+
+  const apiKey = process.env.COHERE_API_KEY;
 
     if (!apiKey) {
       throw fatalError('COHERE_API_KEY is required');
@@ -500,8 +480,7 @@ export const cohereGenerate = workflow(
 
     const data = await response.json();
     return data.generations[0].text;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'COHERE_API_KEY',
@@ -519,9 +498,7 @@ export const cohereGenerate = workflow(
     category: 'AI',
     integration: 'elevenlabs',
     tags: ['ai', 'elevenlabs', 'tts', 'voice', 'audio'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type ElevenLabsParams = {
   text: string;
@@ -533,10 +510,10 @@ type ElevenLabsParams = {
   };
 };
 
-export const elevenlabsTTS = workflow(
-  'elevenlabs-tts',
-  async (params: ElevenLabsParams) => {
-    const apiKey = process.env.ELEVENLABS_API_KEY;
+export async function elevenlabsTTS(params: ElevenLabsParams) {
+  "use step";
+
+  const apiKey = process.env.ELEVENLABS_API_KEY;
 
     if (!apiKey) {
       throw fatalError('ELEVENLABS_API_KEY is required');
@@ -574,8 +551,7 @@ export const elevenlabsTTS = workflow(
       audio: base64Audio,
       contentType: response.headers.get('content-type'),
     };
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'ELEVENLABS_API_KEY',
@@ -593,9 +569,7 @@ export const elevenlabsTTS = workflow(
     category: 'AI',
     integration: 'stability-ai',
     tags: ['ai', 'stability', 'stable-diffusion', 'image-generation'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type StabilityParams = {
   prompt: string;
@@ -605,10 +579,10 @@ type StabilityParams = {
   steps?: number;
 };
 
-export const stabilityAIImage = workflow(
-  'stability-ai-image',
-  async (params: StabilityParams) => {
-    const apiKey = process.env.STABILITY_API_KEY;
+export async function stabilityAIImage(params: StabilityParams) {
+  "use step";
+
+  const apiKey = process.env.STABILITY_API_KEY;
 
     if (!apiKey) {
       throw fatalError('STABILITY_API_KEY is required');
@@ -644,8 +618,7 @@ export const stabilityAIImage = workflow(
       image: base64Image,
       contentType: 'image/png',
     };
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'STABILITY_API_KEY',
@@ -664,9 +637,7 @@ export const stabilityAIImage = workflow(
     category: 'AI',
     integration: 'mistral',
     tags: ['ai', 'mistral', 'llm', 'text-generation'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type MistralParams = {
   messages: { role: string; content: string }[];
@@ -674,10 +645,10 @@ type MistralParams = {
   temperature?: number;
 };
 
-export const mistralAI = workflow(
-  'mistral-ai',
-  async (params: MistralParams) => {
-    const apiKey = process.env.MISTRAL_API_KEY;
+export async function mistralAI(params: MistralParams) {
+  "use step";
+
+  const apiKey = process.env.MISTRAL_API_KEY;
 
     if (!apiKey) {
       throw fatalError('MISTRAL_API_KEY is required');
@@ -702,8 +673,7 @@ export const mistralAI = workflow(
 
     const data = await response.json();
     return data.choices[0].message.content;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'MISTRAL_API_KEY',
@@ -721,19 +691,17 @@ export const mistralAI = workflow(
     category: 'AI',
     integration: 'perplexity',
     tags: ['ai', 'perplexity', 'search', 'llm'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type PerplexityParams = {
   messages: { role: string; content: string }[];
   model?: string;
 };
 
-export const perplexityAI = workflow(
-  'perplexity-ai',
-  async (params: PerplexityParams) => {
-    const apiKey = process.env.PERPLEXITY_API_KEY;
+export async function perplexityAI(params: PerplexityParams) {
+  "use step";
+
+  const apiKey = process.env.PERPLEXITY_API_KEY;
 
     if (!apiKey) {
       throw fatalError('PERPLEXITY_API_KEY is required');
@@ -757,8 +725,7 @@ export const perplexityAI = workflow(
 
     const data = await response.json();
     return data.choices[0].message.content;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'PERPLEXITY_API_KEY',
@@ -776,9 +743,7 @@ export const perplexityAI = workflow(
     category: 'AI',
     integration: 'together',
     tags: ['ai', 'together', 'open-source', 'llm'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type TogetherParams = {
   prompt: string;
@@ -786,10 +751,10 @@ type TogetherParams = {
   max_tokens?: number;
 };
 
-export const togetherAI = workflow(
-  'together-ai',
-  async (params: TogetherParams) => {
-    const apiKey = process.env.TOGETHER_API_KEY;
+export async function togetherAI(params: TogetherParams) {
+  "use step";
+
+  const apiKey = process.env.TOGETHER_API_KEY;
 
     if (!apiKey) {
       throw fatalError('TOGETHER_API_KEY is required');
@@ -814,8 +779,7 @@ export const togetherAI = workflow(
 
     const data = await response.json();
     return data.choices[0].text;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'TOGETHER_API_KEY',
@@ -833,19 +797,17 @@ export const togetherAI = workflow(
     category: 'AI',
     integration: 'runpod',
     tags: ['ai', 'runpod', 'gpu', 'serverless'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type RunPodParams = {
   endpoint_id: string;
   input: Record<string, any>;
 };
 
-export const runpodInference = workflow(
-  'runpod-inference',
-  async (params: RunPodParams) => {
-    const apiKey = process.env.RUNPOD_API_KEY;
+export async function runpodInference(params: RunPodParams) {
+  "use step";
+
+  const apiKey = process.env.RUNPOD_API_KEY;
 
     if (!apiKey) {
       throw fatalError('RUNPOD_API_KEY is required');
@@ -870,8 +832,7 @@ export const runpodInference = workflow(
     }
 
     return await response.json();
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'RUNPOD_API_KEY',
@@ -889,9 +850,7 @@ export const runpodInference = workflow(
     category: 'AI',
     integration: 'deepgram',
     tags: ['ai', 'deepgram', 'speech-to-text', 'transcription'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type DeepgramParams = {
   audio_url: string;
@@ -899,10 +858,10 @@ type DeepgramParams = {
   language?: string;
 };
 
-export const deepgramTranscribe = workflow(
-  'deepgram-transcribe',
-  async (params: DeepgramParams) => {
-    const apiKey = process.env.DEEPGRAM_API_KEY;
+export async function deepgramTranscribe(params: DeepgramParams) {
+  "use step";
+
+  const apiKey = process.env.DEEPGRAM_API_KEY;
 
     if (!apiKey) {
       throw fatalError('DEEPGRAM_API_KEY is required');
@@ -931,8 +890,7 @@ export const deepgramTranscribe = workflow(
 
     const data = await response.json();
     return data.results.channels[0].alternatives[0].transcript;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'DEEPGRAM_API_KEY',
@@ -950,19 +908,17 @@ export const deepgramTranscribe = workflow(
     category: 'AI',
     integration: 'assemblyai',
     tags: ['ai', 'assemblyai', 'transcription', 'audio-analysis'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type AssemblyAIParams = {
   audio_url: string;
   speaker_labels?: boolean;
 };
 
-export const assemblyaiTranscribe = workflow(
-  'assemblyai-transcribe',
-  async (params: AssemblyAIParams) => {
-    const apiKey = process.env.ASSEMBLYAI_API_KEY;
+export async function assemblyaiTranscribe(params: AssemblyAIParams) {
+  "use step";
+
+  const apiKey = process.env.ASSEMBLYAI_API_KEY;
 
     if (!apiKey) {
       throw fatalError('ASSEMBLYAI_API_KEY is required');
@@ -1011,8 +967,7 @@ export const assemblyaiTranscribe = workflow(
     }
 
     return transcript.text;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'ASSEMBLYAI_API_KEY',
@@ -1030,19 +985,17 @@ export const assemblyaiTranscribe = workflow(
     category: 'AI',
     integration: 'fireworks',
     tags: ['ai', 'fireworks', 'llm', 'inference'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type FireworksParams = {
   messages: { role: string; content: string }[];
   model?: string;
 };
 
-export const fireworksAI = workflow(
-  'fireworks-ai',
-  async (params: FireworksParams) => {
-    const apiKey = process.env.FIREWORKS_API_KEY;
+export async function fireworksAI(params: FireworksParams) {
+  "use step";
+
+  const apiKey = process.env.FIREWORKS_API_KEY;
 
     if (!apiKey) {
       throw fatalError('FIREWORKS_API_KEY is required');
@@ -1069,8 +1022,7 @@ export const fireworksAI = workflow(
 
     const data = await response.json();
     return data.choices[0].message.content;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'FIREWORKS_API_KEY',
@@ -1088,19 +1040,17 @@ export const fireworksAI = workflow(
     category: 'AI',
     integration: 'openrouter',
     tags: ['ai', 'openrouter', 'llm', 'multi-model'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type OpenRouterParams = {
   messages: { role: string; content: string }[];
   model?: string;
 };
 
-export const openrouterAI = workflow(
-  'openrouter-ai',
-  async (params: OpenRouterParams) => {
-    const apiKey = process.env.OPENROUTER_API_KEY;
+export async function openrouterAI(params: OpenRouterParams) {
+  "use step";
+
+  const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
       throw fatalError('OPENROUTER_API_KEY is required');
@@ -1124,8 +1074,7 @@ export const openrouterAI = workflow(
 
     const data = await response.json();
     return data.choices[0].message.content;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'OPENROUTER_API_KEY',
@@ -1143,9 +1092,7 @@ export const openrouterAI = workflow(
     category: 'AI',
     integration: 'leonardo',
     tags: ['ai', 'leonardo', 'image-generation', 'creative'],
-    code: `'use workflow';
-
-import { workflow, fatalError, retryableError } from '@vercel/workflow';
+    code: `import { fatalError, retryableError } from '@vercel/workflow';
 
 type LeonardoParams = {
   prompt: string;
@@ -1154,10 +1101,10 @@ type LeonardoParams = {
   height?: number;
 };
 
-export const leonardoAI = workflow(
-  'leonardo-ai',
-  async (params: LeonardoParams) => {
-    const apiKey = process.env.LEONARDO_API_KEY;
+export async function leonardoAI(params: LeonardoParams) {
+  "use step";
+
+  const apiKey = process.env.LEONARDO_API_KEY;
 
     if (!apiKey) {
       throw fatalError('LEONARDO_API_KEY is required');
@@ -1209,8 +1156,7 @@ export const leonardoAI = workflow(
     }
 
     return result.generations_by_pk.generated_images[0].url;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'LEONARDO_API_KEY',
@@ -1228,19 +1174,17 @@ export const leonardoAI = workflow(
     category: 'AI',
     integration: 'groq',
     tags: ['ai', 'groq', 'llm', 'fast-inference'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type GroqParams = {
   messages: { role: string; content: string }[];
   model?: string;
 };
 
-export const groqInference = workflow(
-  'groq-inference',
-  async (params: GroqParams) => {
-    const apiKey = process.env.GROQ_API_KEY;
+export async function groqInference(params: GroqParams) {
+  "use step";
+
+  const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
       throw fatalError('GROQ_API_KEY is required');
@@ -1264,8 +1208,7 @@ export const groqInference = workflow(
 
     const data = await response.json();
     return data.choices[0].message.content;
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'GROQ_API_KEY',
@@ -1282,9 +1225,7 @@ export const groqInference = workflow(
     icon: '🌐',
     category: 'Core',
     tags: ['http', 'api', 'rest'],
-    code: `'use workflow';
-
-import { workflow, retryableError } from '@vercel/workflow';
+    code: `import { retryableError } from '@vercel/workflow';
 
 type HttpRequestParams = {
   url: string;
@@ -1293,10 +1234,10 @@ type HttpRequestParams = {
   body?: any;
 };
 
-export const httpRequest = workflow(
-  'http-request',
-  async (params: HttpRequestParams) => {
-    const response = await fetch(params.url, {
+export async function httpRequest(params: HttpRequestParams) {
+  "use step";
+
+  const response = await fetch(params.url, {
       method: params.method,
       headers: params.headers,
       body: params.body ? JSON.stringify(params.body) : undefined,
@@ -1307,8 +1248,7 @@ export const httpRequest = workflow(
     }
 
     return await response.json();
-  }
-);`,
+}`,
     dependencies: ['@vercel/workflow'],
   },
   {
@@ -1319,9 +1259,7 @@ export const httpRequest = workflow(
     category: 'Payment',
     integration: 'stripe',
     tags: ['stripe', 'payment', 'billing'],
-    code: `'use workflow';
-
-import { workflow, fatalError } from '@vercel/workflow';
+    code: `import { fatalError } from '@vercel/workflow';
 
 type PaymentParams = {
   amount: number;
@@ -1330,10 +1268,10 @@ type PaymentParams = {
   description?: string;
 };
 
-export const stripePayment = workflow(
-  'stripe-payment',
-  async (params: PaymentParams) => {
-    const apiKey = process.env.STRIPE_SECRET_KEY;
+export async function stripePayment(params: PaymentParams) {
+  "use step";
+
+  const apiKey = process.env.STRIPE_SECRET_KEY;
 
     if (!apiKey) {
       throw fatalError('STRIPE_SECRET_KEY is required');
@@ -1358,8 +1296,7 @@ export const stripePayment = workflow(
     }
 
     return await response.json();
-  }
-);`,
+}`,
     envVars: [
       {
         name: 'STRIPE_SECRET_KEY',
