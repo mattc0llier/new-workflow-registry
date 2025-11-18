@@ -1,4 +1,4 @@
-import { RetryableError } from 'workflow';
+import { RetryableError } from '@vercel/workflow';
 
 type HttpRequestParams = {
   url: string;
