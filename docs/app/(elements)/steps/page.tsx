@@ -14,6 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { STEPS } from '@/lib/elements-data';
+import { Icon } from '@/lib/icon-map';
 
 const CATEGORIES = [
   'All',
@@ -98,8 +99,8 @@ export default function StepsPage() {
                 <Card className="group cursor-pointer transition-all hover:shadow-md h-full">
                   <CardHeader>
                     <div className="mb-3 flex items-start justify-between">
-                      <div className="flex size-12 items-center justify-center rounded-lg border bg-gradient-to-br from-background to-muted text-2xl">
-                        {step.icon}
+                      <div className="flex size-12 items-center justify-center rounded-lg border bg-gradient-to-br from-background to-muted">
+                        <Icon name={step.icon} size={20} />
                       </div>
                       <Badge variant="secondary">{step.category}</Badge>
                     </div>

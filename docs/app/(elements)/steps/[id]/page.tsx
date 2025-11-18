@@ -9,6 +9,7 @@ import { CopyButton } from '@/components/copy-button';
 import { CodeBlock } from '@/components/code-block';
 import { StepCodeTabs } from '@/components/step-code-tabs';
 import { STEPS, WORKFLOWS, INTEGRATIONS } from '@/lib/elements-data';
+import { Icon } from '@/lib/icon-map';
 
 // Convert kebab-case to camelCase for function names
 function toCamelCase(str: string): string {
@@ -264,7 +265,7 @@ export async function myWorkflow() {
                       <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
                         <CardHeader className="pb-3">
                           <div className="flex items-start gap-3">
-                            <span className="text-2xl">{workflow.icon}</span>
+                            <Icon name={workflow.icon} size={20} />
                             <div className="flex-1">
                               <CardTitle className="text-base mb-1">
                                 {workflow.name}
@@ -349,7 +350,7 @@ export async function myWorkflow() {
                         href={`/steps/${relatedStep.id}`}
                       >
                         <div className="text-sm hover:text-primary cursor-pointer py-1.5 flex items-center gap-2">
-                          <span>{relatedStep.icon}</span>
+                          <Icon name={relatedStep.icon} size={16} />
                           <span>{relatedStep.name}</span>
                         </div>
                       </Link>
@@ -360,7 +361,7 @@ export async function myWorkflow() {
                         href={`/workflows/${workflow.id}`}
                       >
                         <div className="text-sm hover:text-primary cursor-pointer py-1.5 flex items-center gap-2">
-                          <span>{workflow.icon}</span>
+                          <Icon name={workflow.icon} size={16} />
                           <span>{workflow.name}</span>
                         </div>
                       </Link>

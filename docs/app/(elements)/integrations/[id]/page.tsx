@@ -11,6 +11,7 @@ import {
 import { CompanyLogo } from '@/components/company-logo';
 import { INTEGRATIONS, STEPS, WORKFLOWS } from '@/lib/elements-data';
 import { ExternalLink } from 'lucide-react';
+import { Icon } from '@/lib/icon-map';
 
 export default async function IntegrationPage({
   params,
@@ -115,7 +116,7 @@ export default async function IntegrationPage({
                   <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
                     <CardHeader>
                       <div className="flex items-start gap-3">
-                        <span className="text-3xl">{step.icon}</span>
+                        <Icon name={step.icon} size={24} />
                         <div>
                           <CardTitle className="text-lg">{step.name}</CardTitle>
                           <CardDescription className="mt-2">
@@ -154,7 +155,7 @@ export default async function IntegrationPage({
                     <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
                       <CardHeader>
                         <div className="flex items-start gap-3">
-                          <span className="text-3xl">{workflow.icon}</span>
+                          <Icon name={workflow.icon} size={24} />
                           <div>
                             <CardTitle className="text-lg">
                               {workflow.name}

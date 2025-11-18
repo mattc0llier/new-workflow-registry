@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { WORKFLOWS, STEPS } from '@/lib/elements-data';
 import { ArrowDown } from 'lucide-react';
+import { Icon } from '@/lib/icon-map';
 
 export default async function WorkflowPage({
   params,
@@ -34,7 +35,7 @@ export default async function WorkflowPage({
           {/* Header */}
           <div className="not-prose mb-8">
             <div className="mb-4 flex items-center gap-3">
-              <div className="text-5xl">{workflow.icon}</div>
+              <Icon name={workflow.icon} size={36} />
               <div>
                 <h1 className="text-4xl font-bold">{workflow.name}</h1>
                 <p className="text-muted-foreground text-lg mt-2">
@@ -94,7 +95,7 @@ export default async function WorkflowPage({
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <span className="text-2xl">{ws.step.icon}</span>
+                              <Icon name={ws.step.icon} size={20} />
                               <CardTitle className="text-lg">
                                 {ws.step.name}
                               </CardTitle>

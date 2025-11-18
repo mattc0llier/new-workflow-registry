@@ -114,13 +114,6 @@ export default function IntegrationsPage() {
                     {filteredIntegrations.length} integrations
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-sm">Sort</span>
-                  <button className="flex items-center gap-1 text-sm font-medium">
-                    Popularity
-                    <ChevronDown className="size-4" />
-                  </button>
-                </div>
               </div>
 
               {/* Integrations Grid */}

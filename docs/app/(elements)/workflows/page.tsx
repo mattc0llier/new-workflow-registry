@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { WORKFLOWS } from '@/lib/elements-data';
+import { Icon } from '@/lib/icon-map';
 
 export default function WorkflowsPage() {
   return (
@@ -29,7 +30,7 @@ export default function WorkflowsPage() {
                 <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
                   <CardHeader>
                     <div className="flex items-start gap-3 mb-3">
-                      <span className="text-4xl">{workflow.icon}</span>
+                      <Icon name={workflow.icon} size={28} />
                       <div className="flex-1">
                         <CardTitle className="text-xl">
                           {workflow.name}
