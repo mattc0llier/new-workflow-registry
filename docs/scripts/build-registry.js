@@ -1,26 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 
-// Read the TypeScript file and extract STEPS data
-const tsContent = fs.readFileSync('lib/elements-data.ts', 'utf8');
-
-// Extract STEPS array using regex
-const stepsMatch = tsContent.match(
-  /export const STEPS: Step\[\] = \[([\s\S]*?)\n\];/
-);
-if (!stepsMatch) {
-  console.error('Could not find STEPS array');
-  process.exit(1);
-}
-
-// Parse the steps - this is a simple extraction
-const stepsText = stepsMatch[1];
-
-// Extract individual step objects
-const stepMatches = [...stepsText.matchAll(/\{[\s\S]*?(?=\n  \},|\n\],)/g)];
+// Import the steps data from the compiled structure
+// Since this is a Node script, we need to dynamically import the TypeScript
+const stepsDir = path.join(process.cwd(), 'lib', 'steps');
 
 console.log('🔨 Building workflow registry...\n');
-console.log(`Found ${stepMatches.length} steps to process`);
+
+// Read all step files from the steps directory
+const stepFiles = fs
+  .readdirSync(stepsDir)
+  .filter((file) => file.endsWith('.ts') && file !== 'index.ts');
+
+console.log(`Found ${stepFiles.length} steps to process`);
 
 // Create public/r directory
 const registryDir = path.join(process.cwd(), 'public', 'r');
@@ -28,21 +20,22 @@ fs.mkdirSync(registryDir, { recursive: true });
 
 const registryItems = [];
 
-// For each step, extract key information
-stepMatches.forEach((match, index) => {
-  const stepText = match[0];
+// For each step file, extract key information
+stepFiles.forEach((file) => {
+  const stepPath = path.join(stepsDir, file);
+  const stepContent = fs.readFileSync(stepPath, 'utf8');
 
   // Extract id
-  const idMatch = stepText.match(/id: '([^']+)'/);
-  const nameMatch = stepText.match(/name: '([^']+)'/);
-  const descMatch = stepText.match(/description:\s*'([^']+)'/);
-  const codeMatch = stepText.match(
+  const idMatch = stepContent.match(/id: '([^']+)'/);
+  const nameMatch = stepContent.match(/name: '([^']+)'/);
+  const descMatch = stepContent.match(/description:\s*'([^']+)'/);
+  const codeMatch = stepContent.match(
     /code: `([\s\S]*?)`(?=,\s*(?:envVars|dependencies))/
   );
-  const depsMatch = stepText.match(/dependencies: \[([\s\S]*?)\]/);
+  const depsMatch = stepContent.match(/dependencies: \[([\s\S]*?)\]/);
 
   if (!idMatch || !nameMatch || !descMatch || !codeMatch) {
-    console.log(`⚠️  Skipping step ${index + 1} - missing required fields`);
+    console.log(`⚠️  Skipping ${file} - missing required fields`);
     return;
   }
 
