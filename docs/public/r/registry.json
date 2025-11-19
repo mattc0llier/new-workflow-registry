@@ -40,6 +40,12 @@
       "description": "Fast inference for open-source AI models"
     },
     {
+      "name": "google-gemini-image",
+      "type": "registry:block",
+      "title": "Google Gemini Image",
+      "description": "Generate images from text using Google Gemini (Nano Banana)"
+    },
+    {
       "name": "google-gemini",
       "type": "registry:block",
       "title": "Google Gemini",

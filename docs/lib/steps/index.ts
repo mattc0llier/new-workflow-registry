@@ -5,6 +5,7 @@ import { deepgramTranscribe } from './deepgram-transcribe';
 import { elevenlabsTTS } from './elevenlabs-tts';
 import { fireworksAI } from './fireworks-ai';
 import { googleGemini } from './google-gemini';
+import { googleGeminiImage } from './google-gemini-image';
 import { groqInference } from './groq-inference';
 import { httpRequest } from './http-request';
 import { huggingfaceInference } from './huggingface-inference';
@@ -28,6 +29,7 @@ export const STEPS = [
   anthropicClaude,
   replicateModel,
   googleGemini,
+  googleGeminiImage,
   huggingfaceInference,
   cohereGenerate,
   elevenlabsTTS,
