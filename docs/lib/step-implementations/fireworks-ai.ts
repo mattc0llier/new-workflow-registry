@@ -1,4 +1,4 @@
-import { fatalError } from '@vercel/workflow';
+import { FatalError } from '@vercel/workflow';
 
 type FireworksParams = {
   messages: { role: string; content: string }[];
@@ -11,7 +11,7 @@ export async function fireworksAI(params: FireworksParams) {
   const apiKey = process.env.FIREWORKS_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('FIREWORKS_API_KEY is required');
+    throw new FatalError('FIREWORKS_API_KEY is required');
   }
 
   const response = await fetch(
@@ -31,7 +31,7 @@ export async function fireworksAI(params: FireworksParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(`Fireworks API error: ${response.status}`);
+    throw new FatalError(`Fireworks API error: ${response.status}`);
   }
 
   const data = await response.json();

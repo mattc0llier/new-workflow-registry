@@ -1,4 +1,4 @@
-import { fatalError } from '@vercel/workflow';
+import { FatalError } from '@vercel/workflow';
 
 type SlackMessageParams = {
   channel: string;
@@ -12,7 +12,7 @@ export async function sendSlackMessage(params: SlackMessageParams) {
   const token = process.env.SLACK_BOT_TOKEN;
 
   if (!token) {
-    throw fatalError('SLACK_BOT_TOKEN is required');
+    throw new FatalError('SLACK_BOT_TOKEN is required');
   }
 
   const response = await fetch('https://slack.com/api/chat.postMessage', {
@@ -27,7 +27,7 @@ export async function sendSlackMessage(params: SlackMessageParams) {
   const data = await response.json();
 
   if (!data.ok) {
-    throw fatalError(`Slack API error: ${data.error}`);
+    throw new FatalError(`Slack API error: ${data.error}`);
   }
 
   return {

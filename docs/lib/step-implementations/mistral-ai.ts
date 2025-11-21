@@ -1,4 +1,4 @@
-import { fatalError } from '@vercel/workflow';
+import { FatalError } from '@vercel/workflow';
 
 type MistralParams = {
   messages: { role: string; content: string }[];
@@ -12,7 +12,7 @@ export async function mistralAI(params: MistralParams) {
   const apiKey = process.env.MISTRAL_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('MISTRAL_API_KEY is required');
+    throw new FatalError('MISTRAL_API_KEY is required');
   }
 
   const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
@@ -29,7 +29,7 @@ export async function mistralAI(params: MistralParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(`Mistral API error: ${response.status}`);
+    throw new FatalError(`Mistral API error: ${response.status}`);
   }
 
   const data = await response.json();

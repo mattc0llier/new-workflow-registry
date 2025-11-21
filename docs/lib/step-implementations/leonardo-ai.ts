@@ -1,4 +1,4 @@
-import { fatalError, retryableError } from '@vercel/workflow';
+import { FatalError, retryableError } from '@vercel/workflow';
 
 type LeonardoParams = {
   prompt: string;
@@ -13,7 +13,7 @@ export async function leonardoAI(params: LeonardoParams) {
   const apiKey = process.env.LEONARDO_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('LEONARDO_API_KEY is required');
+    throw new FatalError('LEONARDO_API_KEY is required');
   }
 
   // Generate image
@@ -36,7 +36,7 @@ export async function leonardoAI(params: LeonardoParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(`Leonardo API error: ${response.status}`);
+    throw new FatalError(`Leonardo API error: ${response.status}`);
   }
 
   const { sdGenerationJob } = await response.json();

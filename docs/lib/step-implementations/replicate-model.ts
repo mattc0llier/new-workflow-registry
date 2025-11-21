@@ -1,4 +1,4 @@
-import { fatalError, retryableError } from '@vercel/workflow';
+import { FatalError, retryableError } from '@vercel/workflow';
 
 type ReplicateParams = {
   model: string;
@@ -12,7 +12,7 @@ export async function replicateModel(params: ReplicateParams) {
   const apiKey = process.env.REPLICATE_API_TOKEN;
 
   if (!apiKey) {
-    throw fatalError('REPLICATE_API_TOKEN is required');
+    throw new FatalError('REPLICATE_API_TOKEN is required');
   }
 
   // Create prediction
@@ -30,7 +30,7 @@ export async function replicateModel(params: ReplicateParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(`Replicate API error: ${response.status}`);
+    throw new FatalError(`Replicate API error: ${response.status}`);
   }
 
   const prediction = await response.json();

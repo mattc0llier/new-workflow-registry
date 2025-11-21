@@ -1,4 +1,4 @@
-import { fatalError } from '@vercel/workflow';
+import { FatalError } from '@vercel/workflow';
 
 type DeepgramParams = {
   audio_url: string;
@@ -12,7 +12,7 @@ export async function deepgramTranscribe(params: DeepgramParams) {
   const apiKey = process.env.DEEPGRAM_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('DEEPGRAM_API_KEY is required');
+    throw new FatalError('DEEPGRAM_API_KEY is required');
   }
 
   const model = params.model || 'nova-2';
@@ -33,7 +33,7 @@ export async function deepgramTranscribe(params: DeepgramParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(`Deepgram API error: ${response.status}`);
+    throw new FatalError(`Deepgram API error: ${response.status}`);
   }
 
   const data = await response.json();

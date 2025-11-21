@@ -1,4 +1,4 @@
-import { fatalError } from '@vercel/workflow';
+import { FatalError } from '@vercel/workflow';
 
 type TogetherParams = {
   prompt: string;
@@ -12,7 +12,7 @@ export async function togetherAI(params: TogetherParams) {
   const apiKey = process.env.TOGETHER_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('TOGETHER_API_KEY is required');
+    throw new FatalError('TOGETHER_API_KEY is required');
   }
 
   const response = await fetch('https://api.together.xyz/v1/completions', {
@@ -29,7 +29,7 @@ export async function togetherAI(params: TogetherParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(`Together API error: ${response.status}`);
+    throw new FatalError(`Together API error: ${response.status}`);
   }
 
   const data = await response.json();

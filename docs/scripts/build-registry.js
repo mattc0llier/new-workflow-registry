@@ -36,6 +36,7 @@ stepFiles.forEach((file) => {
   const nameMatch = metadataContent.match(/name: '([^']+)'/);
   const descMatch = metadataContent.match(/description:\s*'([^']+)'/);
   const depsMatch = metadataContent.match(/dependencies: \[([\s\S]*?)\]/);
+  const envVarsMatch = metadataContent.match(/envVars: \[([\s\S]*?)\]/);
 
   if (!nameMatch || !descMatch) {
     console.log(`⚠️  Skipping ${file} - missing required fields`);
@@ -52,6 +53,21 @@ stepFiles.forEach((file) => {
       .split(',')
       .map((d) => d.trim().replace(/['"`]/g, ''))
       .filter((d) => d.length > 0);
+  }
+
+  // Extract environment variables
+  const envVars = {};
+  if (envVarsMatch) {
+    const envVarsContent = envVarsMatch[1];
+    // Match each envVar object: { name: 'KEY', description: '...', required: true }
+    const envVarMatches = envVarsContent.matchAll(
+      /\{\s*name:\s*'([^']+)'[^}]*\}/g
+    );
+    for (const match of envVarMatches) {
+      const envVarName = match[1];
+      // Add empty value - users will fill it in
+      envVars[envVarName] = '';
+    }
   }
 
   console.log(`📦 Generating registry for: ${id}`);
@@ -72,6 +88,11 @@ stepFiles.forEach((file) => {
       },
     ],
   };
+
+  // Add envVars if present
+  if (Object.keys(envVars).length > 0) {
+    registryItem.envVars = envVars;
+  }
 
   // Write individual step registry file
   const itemPath = path.join(registryDir, `${id}.json`);
@@ -115,6 +136,7 @@ workflowFiles.forEach((file) => {
   const nameMatch = metadataContent.match(/name: '([^']+)'/);
   const descMatch = metadataContent.match(/description:\s*'([^']+)'/);
   const depsMatch = metadataContent.match(/dependencies: \[([\s\S]*?)\]/);
+  const envVarsMatch = metadataContent.match(/envVars: \[([\s\S]*?)\]/);
 
   if (!nameMatch || !descMatch) {
     console.log(`⚠️  Skipping ${file} - missing required fields`);
@@ -131,6 +153,21 @@ workflowFiles.forEach((file) => {
       .split(',')
       .map((d) => d.trim().replace(/['"`]/g, ''))
       .filter((d) => d.length > 0);
+  }
+
+  // Extract environment variables
+  const envVars = {};
+  if (envVarsMatch) {
+    const envVarsContent = envVarsMatch[1];
+    // Match each envVar object: { name: 'KEY', description: '...', required: true }
+    const envVarMatches = envVarsContent.matchAll(
+      /\{\s*name:\s*'([^']+)'[^}]*\}/g
+    );
+    for (const match of envVarMatches) {
+      const envVarName = match[1];
+      // Add empty value - users will fill it in
+      envVars[envVarName] = '';
+    }
   }
 
   console.log(`🔄 Generating registry for workflow: ${id}`);
@@ -151,6 +188,11 @@ workflowFiles.forEach((file) => {
       },
     ],
   };
+
+  // Add envVars if present
+  if (Object.keys(envVars).length > 0) {
+    registryItem.envVars = envVars;
+  }
 
   // Write individual workflow registry file
   const itemPath = path.join(registryDir, `${id}.json`);

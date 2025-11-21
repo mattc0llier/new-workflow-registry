@@ -1,4 +1,4 @@
-import { fatalError } from '@vercel/workflow';
+import { FatalError } from '@vercel/workflow';
 
 type OpenRouterParams = {
   messages: { role: string; content: string }[];
@@ -11,7 +11,7 @@ export async function openrouterAI(params: OpenRouterParams) {
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('OPENROUTER_API_KEY is required');
+    throw new FatalError('OPENROUTER_API_KEY is required');
   }
 
   const response = await fetch(
@@ -30,7 +30,7 @@ export async function openrouterAI(params: OpenRouterParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(`OpenRouter API error: ${response.status}`);
+    throw new FatalError(`OpenRouter API error: ${response.status}`);
   }
 
   const data = await response.json();

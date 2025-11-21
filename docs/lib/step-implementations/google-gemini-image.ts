@@ -1,4 +1,4 @@
-import { fatalError } from '@vercel/workflow';
+import { FatalError } from '@vercel/workflow';
 
 type GeminiImageParams = {
   prompt: string;
@@ -11,7 +11,7 @@ export async function googleGeminiImage(params: GeminiImageParams) {
   const apiKey = process.env.GOOGLE_AI_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('GOOGLE_AI_API_KEY is required');
+    throw new FatalError('GOOGLE_AI_API_KEY is required');
   }
 
   const model = params.model || 'gemini-2.5-flash-image';
@@ -33,7 +33,7 @@ export async function googleGeminiImage(params: GeminiImageParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(`Google AI API error: ${response.status}`);
+    throw new FatalError(`Google AI API error: ${response.status}`);
   }
 
   const data = await response.json();
@@ -53,7 +53,7 @@ export async function googleGeminiImage(params: GeminiImageParams) {
   }
 
   if (!imageBase64) {
-    throw fatalError('No image data returned from Google AI');
+    throw new FatalError('No image data returned from Google AI');
   }
 
   return {
