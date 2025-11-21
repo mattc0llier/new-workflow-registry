@@ -1,4 +1,4 @@
-import { FatalError, retryableError } from '@vercel/workflow';
+import { FatalError, retryableError } from 'workflow';
 
 type LeonardoParams = {
   prompt: string;

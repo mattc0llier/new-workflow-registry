@@ -1,18 +1,18 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
+import { SearchInput } from '@/components/search-input';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { SearchInput } from '@/components/search-input';
-import { cn } from '@/lib/utils';
 import { WORKFLOWS } from '@/lib/elements-data';
 import { Icon } from '@/lib/icon-map';
+import { cn } from '@/lib/utils';
 
 export default function WorkflowsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -179,17 +179,6 @@ export default function WorkflowsPage() {
                   </p>
                 </div>
               )}
-
-              {/* Footer CTA */}
-              <div className="mt-12 pt-6 border-t">
-                <p className="text-muted-foreground">
-                  Looking for something specific? Browse our{' '}
-                  <Link href="/steps" className="text-primary hover:underline">
-                    Steps Directory
-                  </Link>{' '}
-                  to build your own custom workflows.
-                </p>
-              </div>
             </div>
           </div>
         </div>

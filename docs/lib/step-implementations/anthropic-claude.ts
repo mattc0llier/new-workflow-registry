@@ -1,4 +1,4 @@
-import { FatalError } from '@vercel/workflow';
+import { FatalError } from 'workflow';
 
 type ClaudeParams = {
   messages: { role: string; content: string }[];
