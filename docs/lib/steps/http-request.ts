@@ -7,7 +7,7 @@ export const httpRequest: Step = {
   icon: 'Globe',
   category: 'Core',
   tags: ['http', 'api', 'rest'],
-  code: `import { RetryableError } from '@vercel/workflow';
+  code: `import { RetryableError } from 'workflow';
 
 type HttpRequestParams = {
   url: string;

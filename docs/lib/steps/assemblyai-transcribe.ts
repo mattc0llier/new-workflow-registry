@@ -8,7 +8,7 @@ export const assemblyaiTranscribe: Step = {
   category: 'AI',
   integration: 'assemblyai',
   tags: ['ai', 'assemblyai', 'transcription', 'audio-analysis'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type AssemblyAIParams = {
   audio_url: string;
@@ -21,7 +21,7 @@ export async function assemblyaiTranscribe(params: AssemblyAIParams) {
   const apiKey = process.env.ASSEMBLYAI_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('ASSEMBLYAI_API_KEY is required');
+    throw new FatalError('ASSEMBLYAI_API_KEY is required');
   }
 
   // Submit transcription
@@ -41,7 +41,7 @@ export async function assemblyaiTranscribe(params: AssemblyAIParams) {
   );
 
   if (!submitResponse.ok) {
-    throw fatalError(\`AssemblyAI API error: \${submitResponse.status}\`);
+    throw new FatalError(\`AssemblyAI API error: \${submitResponse.status}\`);
   }
 
   const { id } = await submitResponse.json();
@@ -63,7 +63,7 @@ export async function assemblyaiTranscribe(params: AssemblyAIParams) {
     if (transcript.status === 'completed') {
       break;
     } else if (transcript.status === 'error') {
-      throw fatalError(\`Transcription failed: \${transcript.error}\`);
+      throw new FatalError(\`Transcription failed: \${transcript.error}\`);
     }
 
     await new Promise((resolve) => setTimeout(resolve, 3000));

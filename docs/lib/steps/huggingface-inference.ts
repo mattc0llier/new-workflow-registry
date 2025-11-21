@@ -8,7 +8,7 @@ export const huggingfaceInference: Step = {
   category: 'AI',
   integration: 'huggingface',
   tags: ['ai', 'huggingface', 'ml', 'transformers'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type HuggingFaceParams = {
   model: string;
@@ -22,7 +22,7 @@ export async function huggingfaceInference(params: HuggingFaceParams) {
   const apiKey = process.env.HUGGINGFACE_API_TOKEN;
 
   if (!apiKey) {
-    throw fatalError('HUGGINGFACE_API_TOKEN is required');
+    throw new FatalError('HUGGINGFACE_API_TOKEN is required');
   }
 
   const response = await fetch(
@@ -41,7 +41,7 @@ export async function huggingfaceInference(params: HuggingFaceParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(\`Hugging Face API error: \${response.status}\`);
+    throw new FatalError(\`Hugging Face API error: \${response.status}\`);
   }
 
   return await response.json();

@@ -8,7 +8,7 @@ export const elevenlabsTTS: Step = {
   category: 'AI',
   integration: 'elevenlabs',
   tags: ['ai', 'elevenlabs', 'tts', 'voice', 'audio'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type ElevenLabsParams = {
   text: string;
@@ -26,7 +26,7 @@ export async function elevenlabsTTS(params: ElevenLabsParams) {
   const apiKey = process.env.ELEVENLABS_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('ELEVENLABS_API_KEY is required');
+    throw new FatalError('ELEVENLABS_API_KEY is required');
   }
 
   const voiceId = params.voice_id || '21m00Tcm4TlvDq8ikWAM'; // Default voice
@@ -50,7 +50,7 @@ export async function elevenlabsTTS(params: ElevenLabsParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(\`ElevenLabs API error: \${response.status}\`);
+    throw new FatalError(\`ElevenLabs API error: \${response.status}\`);
   }
 
   // Return audio as base64

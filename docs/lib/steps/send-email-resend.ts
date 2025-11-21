@@ -8,7 +8,7 @@ export const sendEmailResend: Step = {
   category: 'Communication',
   integration: 'resend',
   tags: ['email', 'resend', 'notifications'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type EmailParams = {
   to: string;
@@ -23,7 +23,7 @@ export async function sendEmail(params: EmailParams) {
   const apiKey = process.env.RESEND_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('RESEND_API_KEY is required');
+    throw new FatalError('RESEND_API_KEY is required');
   }
 
   const response = await fetch('https://api.resend.com/emails', {
@@ -39,7 +39,7 @@ export async function sendEmail(params: EmailParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(\`Resend API error: \${response.status}\`);
+    throw new FatalError(\`Resend API error: \${response.status}\`);
   }
 
   return await response.json();

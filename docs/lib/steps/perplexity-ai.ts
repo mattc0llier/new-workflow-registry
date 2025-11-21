@@ -8,7 +8,7 @@ export const perplexityAI: Step = {
   category: 'AI',
   integration: 'perplexity',
   tags: ['ai', 'perplexity', 'search', 'llm'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type PerplexityParams = {
   messages: { role: string; content: string }[];
@@ -21,7 +21,7 @@ export async function perplexityAI(params: PerplexityParams) {
   const apiKey = process.env.PERPLEXITY_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('PERPLEXITY_API_KEY is required');
+    throw new FatalError('PERPLEXITY_API_KEY is required');
   }
 
   const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -37,7 +37,7 @@ export async function perplexityAI(params: PerplexityParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(\`Perplexity API error: \${response.status}\`);
+    throw new FatalError(\`Perplexity API error: \${response.status}\`);
   }
 
   const data = await response.json();

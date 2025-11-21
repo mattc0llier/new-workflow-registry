@@ -12,6 +12,61 @@ const workflowImplDir = path.join(
   'workflow-implementations'
 );
 
+/**
+ * Replaces the code field in a metadata file with new code.
+ * Uses manual string parsing instead of regex to handle escaped characters correctly.
+ */
+function replaceCodeField(content, newCode) {
+  // Find the start of the code field
+  const codeFieldStart = 'code: `';
+  const startIndex = content.indexOf(codeFieldStart);
+
+  if (startIndex === -1) {
+    throw new Error('Could not find "code: `" in file');
+  }
+
+  // Start walking from after "code: `"
+  let i = startIndex + codeFieldStart.length;
+  let isEscaped = false;
+
+  // Walk through the string, tracking escape sequences
+  while (i < content.length) {
+    const char = content[i];
+
+    if (isEscaped) {
+      // This character is escaped, skip it
+      isEscaped = false;
+    } else if (char === '\\') {
+      // Next character will be escaped
+      isEscaped = true;
+    } else if (char === '`') {
+      // Found an unescaped backtick - check if it's followed by comma
+      if (content[i + 1] === ',') {
+        // This is the end of the code field!
+        // Escape the new code for template literal
+        const escapedCode = newCode
+          .replace(/\\/g, '\\\\')
+          .replace(/`/g, '\\`')
+          .replace(/\$/g, '\\$');
+
+        const beforeCode = content.substring(
+          0,
+          startIndex + codeFieldStart.length
+        );
+        const afterCode = content.substring(i); // includes `,
+
+        return beforeCode + escapedCode + afterCode;
+      }
+    }
+
+    i++;
+  }
+
+  throw new Error(
+    'Could not find end of code field (backtick followed by comma)'
+  );
+}
+
 // Inject step implementations
 const stepFiles = fs
   .readdirSync(stepsDir)
@@ -24,22 +79,15 @@ stepFiles.forEach((file) => {
   if (!fs.existsSync(implPath)) return;
 
   const implCode = fs.readFileSync(implPath, 'utf-8');
-  let stepContent = fs.readFileSync(stepPath, 'utf-8');
+  const stepContent = fs.readFileSync(stepPath, 'utf-8');
 
-  // Escape backticks and dollar signs in the implementation code
-  const escapedCode = implCode
-    .replace(/\\/g, '\\\\')
-    .replace(/`/g, '\\`')
-    .replace(/\$/g, '\\$');
-
-  // Replace the empty code with the implementation
-  stepContent = stepContent.replace(
-    /code: '',\s*\/\/ Injected at build time/,
-    `code: \`${escapedCode}\`,`
-  );
-
-  fs.writeFileSync(stepPath, stepContent);
-  console.log(`✓ Injected ${file}`);
+  try {
+    const updatedContent = replaceCodeField(stepContent, implCode);
+    fs.writeFileSync(stepPath, updatedContent);
+    console.log(`✓ Injected ${file}`);
+  } catch (error) {
+    console.error(`✗ Failed to inject ${file}: ${error.message}`);
+  }
 });
 
 // Inject workflow implementations
@@ -54,22 +102,15 @@ workflowFiles.forEach((file) => {
   if (!fs.existsSync(implPath)) return;
 
   const implCode = fs.readFileSync(implPath, 'utf-8');
-  let workflowContent = fs.readFileSync(workflowPath, 'utf-8');
+  const workflowContent = fs.readFileSync(workflowPath, 'utf-8');
 
-  // Escape backticks and dollar signs in the implementation code
-  const escapedCode = implCode
-    .replace(/\\/g, '\\\\')
-    .replace(/`/g, '\\`')
-    .replace(/\$/g, '\\$');
-
-  // Replace the empty code with the implementation
-  workflowContent = workflowContent.replace(
-    /code: '',\s*\/\/ Injected at build time/,
-    `code: \`${escapedCode}\`,`
-  );
-
-  fs.writeFileSync(workflowPath, workflowContent);
-  console.log(`✓ Injected ${file}`);
+  try {
+    const updatedContent = replaceCodeField(workflowContent, implCode);
+    fs.writeFileSync(workflowPath, updatedContent);
+    console.log(`✓ Injected ${file}`);
+  } catch (error) {
+    console.error(`✗ Failed to inject ${file}: ${error.message}`);
+  }
 });
 
 console.log('\n✅ All implementations injected successfully!');

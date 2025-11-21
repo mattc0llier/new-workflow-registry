@@ -8,7 +8,7 @@ export const runpodInference: Step = {
   category: 'AI',
   integration: 'runpod',
   tags: ['ai', 'runpod', 'gpu', 'serverless'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type RunPodParams = {
   endpoint_id: string;
@@ -21,7 +21,7 @@ export async function runpodInference(params: RunPodParams) {
   const apiKey = process.env.RUNPOD_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('RUNPOD_API_KEY is required');
+    throw new FatalError('RUNPOD_API_KEY is required');
   }
 
   const response = await fetch(
@@ -39,7 +39,7 @@ export async function runpodInference(params: RunPodParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(\`RunPod API error: \${response.status}\`);
+    throw new FatalError(\`RunPod API error: \${response.status}\`);
   }
 
   return await response.json();

@@ -8,7 +8,7 @@ export const stripePayment: Step = {
   category: 'Payment',
   integration: 'stripe',
   tags: ['stripe', 'payment', 'billing'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type PaymentParams = {
   amount: number;
@@ -23,7 +23,7 @@ export async function stripePayment(params: PaymentParams) {
   const apiKey = process.env.STRIPE_SECRET_KEY;
 
   if (!apiKey) {
-    throw fatalError('STRIPE_SECRET_KEY is required');
+    throw new FatalError('STRIPE_SECRET_KEY is required');
   }
 
   const response = await fetch('https://api.stripe.com/v1/payment_intents', {
@@ -41,7 +41,7 @@ export async function stripePayment(params: PaymentParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(\`Stripe API error: \${response.status}\`);
+    throw new FatalError(\`Stripe API error: \${response.status}\`);
   }
 
   return await response.json();

@@ -9,7 +9,7 @@ export const replicateModel: Step = {
   category: 'AI',
   integration: 'replicate',
   tags: ['ai', 'replicate', 'image-generation', 'ml'],
-  code: `import { fatalError, retryableError } from '@vercel/workflow';
+  code: `import { FatalError, retryableError } from 'workflow';
 
 type ReplicateParams = {
   model: string;
@@ -23,7 +23,7 @@ export async function replicateModel(params: ReplicateParams) {
   const apiKey = process.env.REPLICATE_API_TOKEN;
 
   if (!apiKey) {
-    throw fatalError('REPLICATE_API_TOKEN is required');
+    throw new FatalError('REPLICATE_API_TOKEN is required');
   }
 
   // Create prediction
@@ -41,7 +41,7 @@ export async function replicateModel(params: ReplicateParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(\`Replicate API error: \${response.status}\`);
+    throw new FatalError(\`Replicate API error: \${response.status}\`);
   }
 
   const prediction = await response.json();

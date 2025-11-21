@@ -8,7 +8,7 @@ export const stabilityAIImage: Step = {
   category: 'AI',
   integration: 'stability-ai',
   tags: ['ai', 'stability', 'stable-diffusion', 'image-generation'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type StabilityParams = {
   prompt: string;
@@ -24,7 +24,7 @@ export async function stabilityAIImage(params: StabilityParams) {
   const apiKey = process.env.STABILITY_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('STABILITY_API_KEY is required');
+    throw new FatalError('STABILITY_API_KEY is required');
   }
 
   const formData = new FormData();
@@ -47,7 +47,7 @@ export async function stabilityAIImage(params: StabilityParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(\`Stability AI API error: \${response.status}\`);
+    throw new FatalError(\`Stability AI API error: \${response.status}\`);
   }
 
   const imageBuffer = await response.arrayBuffer();

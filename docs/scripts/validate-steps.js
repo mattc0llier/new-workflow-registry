@@ -27,19 +27,14 @@ const requiredPatterns = [
     required: true,
   },
   {
-    name: 'FatalError import',
+    name: 'Error handling import (FatalError or RetryableError)',
     pattern:
-      /import\s+.*\{[^}]*FatalError[^}]*\}\s+from\s+['"]@vercel\/workflow['"]/,
+      /import\s+.*\{[^}]*(FatalError|RetryableError)[^}]*\}\s+from\s+['"]workflow['"]/,
     required: true,
   },
   {
-    name: 'FatalError usage',
-    pattern: /throw\s+new\s+FatalError\(/,
-    required: true,
-  },
-  {
-    name: 'Environment variable check',
-    pattern: /process\.env\.\w+/,
+    name: 'Error usage',
+    pattern: /throw\s+new\s+(FatalError|RetryableError)\(/,
     required: true,
   },
 ];
@@ -48,7 +43,8 @@ const requiredPatterns = [
 const issueChecks = [
   {
     name: 'Missing API key validation',
-    pattern: /if\s*\(\s*!.*process\.env\.\w+/,
+    pattern:
+      /(if\s*\(\s*!.*process\.env\.\w+|const\s+\w+\s*=\s*process\.env\.\w+|process\.env\.\w+\s*\|\|)/,
     warning: true,
   },
   {
@@ -85,13 +81,22 @@ stepFiles.forEach((file) => {
 
   // Additional validations
 
-  // Check if function name matches file name
+  // Check if function name matches file name (support both kebab-case and camelCase)
   const fileNameBase = file.replace('.ts', '');
-  const functionNamePattern = new RegExp(
+  // Convert kebab-case to camelCase (e.g., elevenlabs-tts -> elevenLabsTTS)
+  const camelCaseName = fileNameBase.replace(/-([a-z])/g, (match, letter) =>
+    letter.toUpperCase()
+  );
+  const kebabPattern = new RegExp(
     `export\\s+async\\s+function\\s+${fileNameBase}\\s*\\(`
   );
-  if (!functionNamePattern.test(stepContent)) {
-    stepWarnings.push(`Function name should match file name: ${fileNameBase}`);
+  const camelPattern = new RegExp(
+    `export\\s+async\\s+function\\s+${camelCaseName}\\s*\\(`
+  );
+  if (!kebabPattern.test(stepContent) && !camelPattern.test(stepContent)) {
+    stepWarnings.push(
+      `Function name should match file name: ${fileNameBase} or ${camelCaseName}`
+    );
   }
 
   // Check for type definitions

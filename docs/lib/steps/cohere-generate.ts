@@ -8,7 +8,7 @@ export const cohereGenerate: Step = {
   category: 'AI',
   integration: 'cohere',
   tags: ['ai', 'cohere', 'llm', 'text-generation'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type CohereParams = {
   prompt: string;
@@ -23,7 +23,7 @@ export async function cohereGenerate(params: CohereParams) {
   const apiKey = process.env.COHERE_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('COHERE_API_KEY is required');
+    throw new FatalError('COHERE_API_KEY is required');
   }
 
   const response = await fetch('https://api.cohere.ai/v1/generate', {
@@ -41,7 +41,7 @@ export async function cohereGenerate(params: CohereParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(\`Cohere API error: \${response.status}\`);
+    throw new FatalError(\`Cohere API error: \${response.status}\`);
   }
 
   const data = await response.json();

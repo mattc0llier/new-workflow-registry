@@ -8,7 +8,7 @@ export const googleGemini: Step = {
   category: 'AI',
   integration: 'google-ai',
   tags: ['ai', 'google', 'gemini', 'llm'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type GeminiParams = {
   prompt: string;
@@ -22,7 +22,7 @@ export async function googleGemini(params: GeminiParams) {
   const apiKey = process.env.GOOGLE_AI_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('GOOGLE_AI_API_KEY is required');
+    throw new FatalError('GOOGLE_AI_API_KEY is required');
   }
 
   const model = params.model || 'gemini-1.5-pro';
@@ -47,7 +47,7 @@ export async function googleGemini(params: GeminiParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(\`Google AI API error: \${response.status}\`);
+    throw new FatalError(\`Google AI API error: \${response.status}\`);
   }
 
   const data = await response.json();

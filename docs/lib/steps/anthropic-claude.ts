@@ -8,7 +8,7 @@ export const anthropicClaude: Step = {
   category: 'AI',
   integration: 'anthropic',
   tags: ['ai', 'anthropic', 'claude', 'llm'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type ClaudeParams = {
   messages: { role: string; content: string }[];
@@ -22,7 +22,7 @@ export async function anthropicClaude(params: ClaudeParams) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('ANTHROPIC_API_KEY is required');
+    throw new FatalError('ANTHROPIC_API_KEY is required');
   }
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -40,7 +40,7 @@ export async function anthropicClaude(params: ClaudeParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(\`Anthropic API error: \${response.status}\`);
+    throw new FatalError(\`Anthropic API error: \${response.status}\`);
   }
 
   const data = await response.json();

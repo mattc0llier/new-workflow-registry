@@ -8,7 +8,7 @@ export const openaiChat: Step = {
   category: 'AI',
   integration: 'openai',
   tags: ['ai', 'openai', 'gpt', 'llm'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type ChatParams = {
   messages: { role: string; content: string }[];
@@ -22,7 +22,7 @@ export async function openaiChat(params: ChatParams) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('OPENAI_API_KEY is required');
+    throw new FatalError('OPENAI_API_KEY is required');
   }
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -39,7 +39,7 @@ export async function openaiChat(params: ChatParams) {
   });
 
   if (!response.ok) {
-    throw fatalError(\`OpenAI API error: \${response.status}\`);
+    throw new FatalError(\`OpenAI API error: \${response.status}\`);
   }
 
   const data = await response.json();

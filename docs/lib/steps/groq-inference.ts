@@ -8,7 +8,7 @@ export const groqInference: Step = {
   category: 'AI',
   integration: 'groq',
   tags: ['ai', 'groq', 'llm', 'fast-inference'],
-  code: `import { fatalError } from '@vercel/workflow';
+  code: `import { FatalError } from 'workflow';
 
 type GroqParams = {
   messages: { role: string; content: string }[];
@@ -21,7 +21,7 @@ export async function groqInference(params: GroqParams) {
   const apiKey = process.env.GROQ_API_KEY;
 
   if (!apiKey) {
-    throw fatalError('GROQ_API_KEY is required');
+    throw new FatalError('GROQ_API_KEY is required');
   }
 
   const response = await fetch(
@@ -40,7 +40,7 @@ export async function groqInference(params: GroqParams) {
   );
 
   if (!response.ok) {
-    throw fatalError(\`Groq API error: \${response.status}\`);
+    throw new FatalError(\`Groq API error: \${response.status}\`);
   }
 
   const data = await response.json();
