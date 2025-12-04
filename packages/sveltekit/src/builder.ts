@@ -19,14 +19,16 @@ async function convertSvelteKitRequest(request) {
 
 export class SvelteKitBuilder extends BaseBuilder {
   constructor(config?: Partial<SvelteKitConfig>) {
+    const workingDir = config?.workingDir || process.cwd();
+
     super({
       ...config,
-      dirs: ['workflows'],
+      dirs: ['workflows', 'src/workflows', 'routes', 'src/routes'],
       buildTarget: 'sveltekit' as const,
       stepsBundlePath: '', // unused in base
       workflowsBundlePath: '', // unused in base
       webhookBundlePath: '', // unused in base
-      workingDir: config?.workingDir || process.cwd(),
+      workingDir,
     });
   }
 
@@ -155,7 +157,6 @@ export const POST = async ({request}) => {
     await this.createWebhookBundle({
       outfile: webhookRouteFile,
       bundle: false, // SvelteKit will handle bundling
-      suppressUndefinedRejections: true,
     });
 
     // Post-process the generated file to wrap with SvelteKit request converter

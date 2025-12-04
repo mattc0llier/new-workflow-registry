@@ -1,5 +1,82 @@
 # @workflow/world-postgres
 
+## 4.1.0-beta.16
+
+### Patch Changes
+
+- ef8e0e5: Increase polling interval for pg-boss to reduce interval between steps
+- 8d4562e: Rename leftover references to "embedded world" to be "local world"
+- Updated dependencies [6e8e828]
+- Updated dependencies [10c5b91]
+- Updated dependencies [bdde1bd]
+- Updated dependencies [2faddf3]
+- Updated dependencies [8d4562e]
+  - @workflow/world-local@4.0.1-beta.14
+  - @workflow/world@4.0.1-beta.8
+  - @workflow/errors@4.0.1-beta.7
+
+## 4.1.0-beta.15
+
+### Patch Changes
+
+- Updated dependencies [fb9fd0f]
+- Updated dependencies [40057db]
+  - @workflow/world@4.0.1-beta.7
+  - @workflow/world-local@4.0.1-beta.13
+  - @workflow/errors@4.0.1-beta.6
+
+## 4.1.0-beta.14
+
+### Patch Changes
+
+- Updated dependencies [edb69c3]
+  - @workflow/world-local@4.0.1-beta.12
+  - @workflow/errors@4.0.1-beta.6
+
+## 4.1.0-beta.13
+
+### Patch Changes
+
+- Updated dependencies [3436629]
+  - @workflow/world-local@4.0.1-beta.11
+
+## 4.1.0-beta.12
+
+### Patch Changes
+
+- 3d99d6d: Update `@vercel/oidc` and `@vercel/queue` to fix expired OIDC token edge case
+- Updated dependencies [3d99d6d]
+  - @workflow/world-local@5.0.0-beta.10
+
+## 4.1.0-beta.11
+
+### Patch Changes
+
+- 4b70739: Require specifying runId when writing to stream
+- Updated dependencies [4b70739]
+  - @workflow/world-local@5.0.0-beta.9
+  - @workflow/world@4.0.1-beta.6
+  - @workflow/errors@4.0.1-beta.5
+
+## 4.1.0-beta.10
+
+### Patch Changes
+
+- 5790cb2: Use drizzle migrator
+- b97b6bf: Lock all dependencies in our packages
+- 00b0bb9: Support structured errors for steps and runs
+- a6f5545: Update migration and parse data through schemas
+- 79480f2: Clean up Hook entities after a workflow run has completed
+- Updated dependencies [aa015af]
+- Updated dependencies [00b0bb9]
+- Updated dependencies [b97b6bf]
+- Updated dependencies [00b0bb9]
+- Updated dependencies [00b0bb9]
+- Updated dependencies [79480f2]
+  - @workflow/world-local@5.0.0-beta.8
+  - @workflow/errors@4.0.1-beta.5
+  - @workflow/world@4.0.1-beta.5
+
 ## 4.1.0-beta.9
 
 ### Patch Changes

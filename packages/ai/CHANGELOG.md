@@ -1,5 +1,99 @@
 # @workflow/ai
 
+## 4.0.1-beta.26
+
+### Patch Changes
+
+- workflow@4.0.1-beta.26
+
+## 4.0.1-beta.25
+
+### Patch Changes
+
+- workflow@4.0.1-beta.25
+
+## 4.0.1-beta.24
+
+### Patch Changes
+
+- workflow@4.0.1-beta.24
+
+## 4.0.1-beta.23
+
+### Patch Changes
+
+- 172e015: Add AI provider step wrapper functions
+- Updated dependencies [1ac5592]
+  - workflow@4.0.1-beta.23
+
+## 4.0.1-beta.22
+
+### Patch Changes
+
+- 17904fc: Add `prepareStep` argument for DurableAgent to modify messages between AI loop steps
+- 17904fc: Make current messages state available to tool calls
+- Updated dependencies [6dd1750]
+  - workflow@4.0.1-beta.22
+
+## 4.0.1-beta.21
+
+### Patch Changes
+
+- aba5264: Add `onStepFinish` callback to `DurableAgent#stream()`
+  - workflow@4.0.1-beta.21
+
+## 4.0.1-beta.20
+
+### Patch Changes
+
+- 00e3345: Make `DurableAgent#stream()` return a `messages` array
+  - workflow@4.0.1-beta.20
+
+## 4.0.1-beta.19
+
+### Patch Changes
+
+- workflow@4.0.1-beta.19
+
+## 4.0.1-beta.18
+
+### Patch Changes
+
+- 43a3f79: DurableAgent#stream now sends `start` and `finish` chunks properly at the start and end
+- 154670a: Fix `DurableAgent` to propagate `FatalError` in tool calls
+- 1e636e1: Make `writable` property be required in `DurableAgent#stream()`
+  - workflow@4.0.1-beta.18
+
+## 4.0.1-beta.17
+
+### Patch Changes
+
+- workflow@4.0.1-beta.17
+
+## 4.0.1-beta.16
+
+### Patch Changes
+
+- workflow@4.0.1-beta.16
+
+## 4.0.1-beta.15
+
+### Patch Changes
+
+- 566681a: Add stopCondition argument to DurableAgent and emit error parts to writeable stream
+  - workflow@4.0.1-beta.15
+
+## 4.0.1-beta.14
+
+### Patch Changes
+
+- 45b7b41: Add support for defining `model` as a step function initializer
+- 23f5c1d: Make `tools` optional in DurableAgent
+- Updated dependencies [b97b6bf]
+- Updated dependencies [6419962]
+- Updated dependencies [9335026]
+  - workflow@4.0.1-beta.14
+
 ## 4.0.1-beta.13
 
 ### Patch Changes

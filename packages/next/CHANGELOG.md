@@ -1,5 +1,140 @@
 # @workflow/next
 
+## 4.0.1-beta.26
+
+### Patch Changes
+
+- 1112901: Stop reading server externals internal list
+  - @workflow/core@4.0.1-beta.23
+  - @workflow/builders@4.0.1-beta.22
+
+## 4.0.1-beta.25
+
+### Patch Changes
+
+- ac7997b: Update to latest swc/core and preserve JSX
+- Updated dependencies [ac7997b]
+- Updated dependencies [02c41cc]
+  - @workflow/swc-plugin@4.0.1-beta.11
+  - @workflow/builders@4.0.1-beta.21
+  - @workflow/core@4.0.1-beta.22
+
+## 4.0.1-beta.24
+
+### Patch Changes
+
+- Updated dependencies [2f0840b]
+- Updated dependencies [555d7a6]
+  - @workflow/core@4.0.1-beta.21
+  - @workflow/swc-plugin@4.0.1-beta.10
+  - @workflow/builders@4.0.1-beta.20
+
+## 4.0.1-beta.23
+
+### Patch Changes
+
+- 8d4562e: Rename leftover references to "embedded world" to be "local world"
+- Updated dependencies [d53bf90]
+- Updated dependencies [0f1645b]
+- Updated dependencies [3c19e90]
+- Updated dependencies [1ac5592]
+- Updated dependencies [5b91861]
+- Updated dependencies [bdde1bd]
+- Updated dependencies [0cacb99]
+- Updated dependencies [8d4562e]
+  - @workflow/builders@4.0.1-beta.19
+  - @workflow/core@4.0.1-beta.20
+  - @workflow/swc-plugin@4.0.1-beta.9
+
+## 4.0.1-beta.22
+
+### Patch Changes
+
+- Updated dependencies [07800c2]
+- Updated dependencies [fb9fd0f]
+- Updated dependencies [b042ba7]
+- Updated dependencies [8b470f0]
+  - @workflow/core@4.0.1-beta.19
+  - @workflow/swc-plugin@4.0.1-beta.8
+  - @workflow/builders@4.0.1-beta.18
+
+## 4.0.1-beta.21
+
+### Patch Changes
+
+- @workflow/core@4.0.1-beta.18
+- @workflow/builders@4.0.1-beta.17
+
+## 4.0.1-beta.20
+
+### Patch Changes
+
+- @workflow/core@4.0.1-beta.17
+- @workflow/builders@4.0.1-beta.16
+
+## 4.0.1-beta.19
+
+### Patch Changes
+
+- Updated dependencies [3436629]
+- Updated dependencies [9961140]
+- Updated dependencies [73b6c68]
+  - @workflow/core@4.0.1-beta.16
+  - @workflow/builders@4.0.1-beta.15
+
+## 4.0.1-beta.18
+
+### Patch Changes
+
+- Updated dependencies [e5c5236]
+  - @workflow/swc-plugin@4.0.1-beta.7
+  - @workflow/builders@4.0.1-beta.14
+
+## 4.0.1-beta.17
+
+### Patch Changes
+
+- Updated dependencies [3d99d6d]
+  - @workflow/core@4.0.1-beta.15
+  - @workflow/builders@4.0.1-beta.13
+
+## 4.0.1-beta.16
+
+### Patch Changes
+
+- Updated dependencies [6e41c90]
+  - @workflow/core@4.0.1-beta.14
+  - @workflow/builders@4.0.1-beta.12
+
+## 4.0.1-beta.15
+
+### Patch Changes
+
+- Updated dependencies [2fde24e]
+- Updated dependencies [4b70739]
+  - @workflow/core@4.0.1-beta.13
+  - @workflow/builders@4.0.1-beta.11
+
+## 4.0.1-beta.14
+
+### Patch Changes
+
+- Updated dependencies [5eb588a]
+- Updated dependencies [00b0bb9]
+- Updated dependencies [0b848cd]
+- Updated dependencies [85ce8e0]
+- Updated dependencies [8e96134]
+- Updated dependencies [b97b6bf]
+- Updated dependencies [45b7b41]
+- Updated dependencies [f8e5d10]
+- Updated dependencies [6be03f3]
+- Updated dependencies [8002e0f]
+- Updated dependencies [f07b2da]
+- Updated dependencies [aecdcdf]
+  - @workflow/swc-plugin@4.0.1-beta.6
+  - @workflow/core@4.0.1-beta.12
+  - @workflow/builders@4.0.1-beta.10
+
 ## 4.0.1-beta.13
 
 ### Patch Changes

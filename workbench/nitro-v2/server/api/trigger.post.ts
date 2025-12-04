@@ -1,7 +1,7 @@
 import { defineEventHandler, getRequestURL, readRawBody } from 'h3';
 import { start } from 'workflow/api';
 import { hydrateWorkflowArguments } from 'workflow/internal/serialization';
-import { allWorkflows } from '../_workflows.js';
+import { allWorkflows } from '../../_workflows.js';
 
 export default defineEventHandler(async (event) => {
   const url = getRequestURL(event);
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const run = await start(workflow as any, args as any);
-    console.log('Run:', run);
+    console.log('Run:', run.runId);
     return Response.json(run);
   } catch (err) {
     console.error(`Failed to start!!`, err);

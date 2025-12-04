@@ -1,3 +1,4 @@
+import { withResolvers } from '@workflow/utils';
 import { assert, describe, expect, test } from 'vitest';
 import { dehydrateWorkflowArguments } from '../src/serialization';
 import { cliInspectJson, isLocalDeployment } from './utils';
@@ -21,9 +22,15 @@ async function triggerWorkflow(
 
   url.searchParams.set('workflowFile', workflowFile);
   url.searchParams.set('workflowFn', workflowFn);
+
+  const ops: Promise<void>[] = [];
+  const { promise: runIdPromise, resolve: resolveRunId } =
+    withResolvers<string>();
+  const dehydratedArgs = dehydrateWorkflowArguments(args, ops, runIdPromise);
+
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify(dehydrateWorkflowArguments(args, [], globalThis)),
+    body: JSON.stringify(dehydratedArgs),
   });
   if (!res.ok) {
     throw new Error(
@@ -33,6 +40,11 @@ async function triggerWorkflow(
     );
   }
   const run = await res.json();
+  resolveRunId(run.runId);
+
+  // Resolve and wait for any stream operations
+  await Promise.all(ops);
+
   return run;
 }
 
@@ -90,12 +102,35 @@ describe('e2e', () => {
       output: 133,
     });
     // In local vs. vercel backends, the workflow name is different, so we check for either,
-    // since this test runs against both.
+    // since this test runs against both. Also different workbenches have different directory structures.
     expect(json.workflowName).toBeOneOf([
       `workflow//example/${workflow.workflowFile}//${workflow.workflowFn}`,
       `workflow//${workflow.workflowFile}//${workflow.workflowFn}`,
+      `workflow//src/${workflow.workflowFile}//${workflow.workflowFn}`,
     ]);
   });
+
+  const isNext = process.env.APP_NAME?.includes('nextjs');
+  const isLocal = deploymentUrl.includes('localhost');
+  // only works with framework that transpiles react and
+  // doesn't work on Vercel due to eval hack so react isn't
+  // bundled in function
+  const shouldSkipReactRenderTest = !(isNext && isLocal);
+
+  test.skipIf(shouldSkipReactRenderTest)(
+    'should work with react rendering in step',
+    async () => {
+      const run = await triggerWorkflow(
+        {
+          workflowFile: 'workflows/8_react_render.tsx',
+          workflowFn: 'reactWorkflow',
+        },
+        []
+      );
+      const returnValue = await getWorkflowReturnValue(run.runId);
+      expect(returnValue).toBe('<div>hello world <!-- -->2</div>');
+    }
+  );
 
   test('promiseAllWorkflow', { timeout: 60_000 }, async () => {
     const run = await triggerWorkflow('promiseAllWorkflow', []);
@@ -154,7 +189,10 @@ describe('e2e', () => {
       method: 'POST',
       body: JSON.stringify({ token: 'invalid' }),
     });
-    expect(res.status).toBe(404);
+    // NOTE: For Nitro apps (Vite, Hono, etc.) in dev mode, status 404 does some
+    // unexpected stuff and could return a Vite SPA fallback or can cause a Hono route to hang.
+    // This is because Nitro passes the 404 requests to the dev server to handle.
+    expect(res.status).toBeOneOf([404, 422]);
     body = await res.json();
     expect(body).toBeNull();
 
@@ -578,14 +616,17 @@ describe('e2e', () => {
       expect(returnValue.cause).toHaveProperty('stack');
       expect(typeof returnValue.cause.stack).toBe('string');
 
-      // Known issue: SvelteKit dev mode has incorrect source map mappings for bundled imports.
+      // Known issue: vite-based frameworks dev mode has incorrect source map mappings for bundled imports.
       // esbuild with bundle:true inlines helpers.ts but source maps incorrectly map to 99_e2e.ts
       // This works correctly in production and other frameworks.
       // TODO: Investigate esbuild source map generation for bundled modules
-      const isSvelteKitDevMode =
-        process.env.APP_NAME === 'sveltekit' && isLocalDeployment();
+      const isViteBasedFrameworkDevMode =
+        (process.env.APP_NAME === 'sveltekit' ||
+          process.env.APP_NAME === 'vite' ||
+          process.env.APP_NAME === 'astro') &&
+        isLocalDeployment();
 
-      if (!isSvelteKitDevMode) {
+      if (!isViteBasedFrameworkDevMode) {
         // Stack trace should include frames from the helper module (helpers.ts)
         expect(returnValue.cause.stack).toContain('helpers.ts');
       }
@@ -689,7 +730,7 @@ describe('e2e', () => {
   );
 
   test(
-    'stepFunctionPassingWorkflow - step function references can be passed as arguments',
+    'stepFunctionPassingWorkflow - step function references can be passed as arguments (without closure vars)',
     { timeout: 60_000 },
     async () => {
       // This workflow passes a step function reference to another step
@@ -717,6 +758,90 @@ describe('e2e', () => {
         (event) => event.eventType === 'step_completed'
       );
       expect(stepCompletedEvents).toHaveLength(1);
+    }
+  );
+
+  test(
+    'stepFunctionWithClosureWorkflow - step function with closure variables passed as argument',
+    { timeout: 60_000 },
+    async () => {
+      // This workflow creates a nested step function with closure variables,
+      // then passes it to another step which invokes it.
+      // The closure variables should be serialized and preserved across the call.
+      const run = await triggerWorkflow('stepFunctionWithClosureWorkflow', []);
+      const returnValue = await getWorkflowReturnValue(run.runId);
+
+      // Expected: "Wrapped: Result: 21"
+      // - calculate(7) uses closure vars: prefix="Result: ", multiplier=3
+      // - 7 * 3 = 21, prefixed with "Result: " = "Result: 21"
+      // - stepThatCallsStepFn wraps it: "Wrapped: Result: 21"
+      expect(returnValue).toBe('Wrapped: Result: 21');
+
+      // Verify the run completed successfully
+      const { json: runData } = await cliInspectJson(
+        `runs ${run.runId} --withData`
+      );
+      expect(runData.status).toBe('completed');
+      expect(runData.output).toBe('Wrapped: Result: 21');
+    }
+  );
+
+  test(
+    'closureVariableWorkflow - nested step functions with closure variables',
+    { timeout: 60_000 },
+    async () => {
+      // This workflow uses a nested step function that references closure variables
+      // from the parent workflow scope (multiplier, prefix, baseValue)
+      const run = await triggerWorkflow('closureVariableWorkflow', [7]);
+      const returnValue = await getWorkflowReturnValue(run.runId);
+
+      // Expected: baseValue (7) * multiplier (3) = 21, prefixed with "Result: "
+      expect(returnValue).toBe('Result: 21');
+    }
+  );
+
+  test(
+    'spawnWorkflowFromStepWorkflow - spawning a child workflow using start() inside a step',
+    { timeout: 120_000 },
+    async () => {
+      // This workflow spawns another workflow using start() inside a step function
+      // This is the recommended pattern for spawning workflows from within workflows
+      const inputValue = 42;
+      const run = await triggerWorkflow('spawnWorkflowFromStepWorkflow', [
+        inputValue,
+      ]);
+      const returnValue = await getWorkflowReturnValue(run.runId);
+
+      // Verify the parent workflow completed
+      expect(returnValue).toHaveProperty('parentInput');
+      expect(returnValue.parentInput).toBe(inputValue);
+
+      // Verify the child workflow was spawned
+      expect(returnValue).toHaveProperty('childRunId');
+      expect(typeof returnValue.childRunId).toBe('string');
+      expect(returnValue.childRunId.startsWith('wrun_')).toBe(true);
+
+      // Verify the child workflow completed and returned the expected result
+      expect(returnValue).toHaveProperty('childResult');
+      expect(returnValue.childResult).toEqual({
+        childResult: inputValue * 2, // doubleValue(42) = 84
+        originalValue: inputValue,
+      });
+
+      // Verify both runs completed successfully via CLI
+      const { json: parentRunData } = await cliInspectJson(
+        `runs ${run.runId} --withData`
+      );
+      expect(parentRunData.status).toBe('completed');
+
+      const { json: childRunData } = await cliInspectJson(
+        `runs ${returnValue.childRunId} --withData`
+      );
+      expect(childRunData.status).toBe('completed');
+      expect(childRunData.output).toEqual({
+        childResult: inputValue * 2,
+        originalValue: inputValue,
+      });
     }
   );
 });

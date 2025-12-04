@@ -1,5 +1,30 @@
 # @workflow/world
 
+## 4.0.1-beta.8
+
+### Patch Changes
+
+- 10c5b91: Export QueueOptions type
+- bdde1bd: track queue overhead with opentelemetry
+
+## 4.0.1-beta.7
+
+### Patch Changes
+
+- fb9fd0f: Add support for closure scope vars in step functions
+
+## 4.0.1-beta.6
+
+### Patch Changes
+
+- 4b70739: Require specifying runId when writing to stream
+
+## 4.0.1-beta.5
+
+### Patch Changes
+
+- 00b0bb9: Add error stack propogation to steps and runs
+
 ## 4.0.1-beta.4
 
 ### Patch Changes
