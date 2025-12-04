@@ -9,6 +9,8 @@ export const perplexityAI: Step = {
   integration: 'perplexity',
   tags: ['ai', 'perplexity', 'search', 'llm'],
   code: `import { FatalError } from 'workflow';
+import { generateText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
 
 type PerplexityParams = {
   messages: { role: string; content: string }[];
@@ -24,24 +26,23 @@ export async function perplexityAI(params: PerplexityParams) {
     throw new FatalError('PERPLEXITY_API_KEY is required');
   }
 
-  const response = await fetch('https://api.perplexity.ai/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: \`Bearer \${apiKey}\`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: params.model || 'llama-3.1-sonar-large-128k-online',
+  try {
+    const perplexity = createOpenAI({
+      baseURL: 'https://api.perplexity.ai',
+      apiKey,
+    });
+
+    const { text } = await generateText({
+      model: perplexity(params.model || 'llama-3.1-sonar-large-128k-online'),
       messages: params.messages,
-    }),
-  });
+    });
 
-  if (!response.ok) {
-    throw new FatalError(\`Perplexity API error: \${response.status}\`);
+    return text;
+  } catch (error) {
+    throw new FatalError(
+      \`Perplexity API error: \${error instanceof Error ? error.message : 'Unknown error'}\`
+    );
   }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
 }
 `,
 

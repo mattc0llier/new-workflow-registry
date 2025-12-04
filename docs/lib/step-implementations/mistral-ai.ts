@@ -1,4 +1,6 @@
 import { FatalError } from 'workflow';
+import { generateText } from 'ai';
+import { mistral } from '@ai-sdk/mistral';
 
 type MistralParams = {
   messages: { role: string; content: string }[];
@@ -15,23 +17,17 @@ export async function mistralAI(params: MistralParams) {
     throw new FatalError('MISTRAL_API_KEY is required');
   }
 
-  const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: params.model || 'mistral-large-latest',
+  try {
+    const { text } = await generateText({
+      model: mistral(params.model || 'mistral-large-latest', { apiKey }),
       messages: params.messages,
       temperature: params.temperature || 0.7,
-    }),
-  });
+    });
 
-  if (!response.ok) {
-    throw new FatalError(`Mistral API error: ${response.status}`);
+    return text;
+  } catch (error) {
+    throw new FatalError(
+      `Mistral API error: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
 }

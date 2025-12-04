@@ -1,3 +1,5 @@
+import { anthropic } from '@ai-sdk/anthropic';
+import { generateText } from 'ai';
 import { FatalError } from 'workflow';
 
 type ClaudeParams = {
@@ -15,24 +17,19 @@ export async function anthropicClaude(params: ClaudeParams) {
     throw new FatalError('ANTHROPIC_API_KEY is required');
   }
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: params.model || 'claude-3-5-sonnet-20241022',
+  try {
+    const { text } = await generateText({
+      model: anthropic(params.model || 'claude-3-5-sonnet-20241022', {
+        apiKey,
+      }),
       messages: params.messages,
-      max_tokens: params.max_tokens || 4096,
-    }),
-  });
+      maxTokens: params.max_tokens || 4096,
+    });
 
-  if (!response.ok) {
-    throw new FatalError(`Anthropic API error: ${response.status}`);
+    return text;
+  } catch (error) {
+    throw new FatalError(
+      `Anthropic API error: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
-
-  const data = await response.json();
-  return data.content[0].text;
 }

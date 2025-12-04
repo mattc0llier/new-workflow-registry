@@ -7,7 +7,9 @@ export const googleGeminiImage: Step = {
   icon: 'Image',
   category: 'AI',
   tags: ['google', 'gemini', 'ai', 'image-generation', 'nano-banana'],
-  code: `import { FatalError } from 'workflow';
+  code: `import { google } from '@ai-sdk/google';
+import { generateText } from 'ai';
+import { FatalError } from 'workflow';
 
 type GeminiImageParams = {
   prompt: string;
@@ -23,53 +25,39 @@ export async function googleGeminiImage(params: GeminiImageParams) {
     throw new FatalError('GOOGLE_AI_API_KEY is required');
   }
 
-  const model = params.model || 'gemini-2.5-flash-image';
-  const response = await fetch(
-    \`https://generativelanguage.googleapis.com/v1beta/models/\${model}:generateContent?key=\${apiKey}\`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: params.prompt }],
-          },
-        ],
-      }),
+  try {
+    const result = await generateText({
+      model: google(params.model || 'gemini-3-pro-image', { apiKey }),
+      prompt: params.prompt,
+    });
+
+    // Extract generated images from files
+    const images =
+      result.files?.filter((file) => file.mediaType?.startsWith('image/')) ||
+      [];
+
+    if (images.length === 0) {
+      throw new FatalError('No image data returned from Google AI');
     }
-  );
 
-  if (!response.ok) {
-    throw new FatalError(\`Google AI API error: \${response.status}\`);
+    // Return the first generated image (you can modify to return all)
+    const firstImage = images[0];
+
+    return {
+      image: firstImage.url || firstImage.data, // URL or base64 data
+      text: result.text || null,
+      mimeType: firstImage.mediaType || 'image/png',
+      allImages: images.map((img) => ({
+        url: img.url,
+        data: img.data,
+        mediaType: img.mediaType,
+      })),
+    };
+  } catch (error) {
+    throw new FatalError(
+      \`Google AI API error: \${error instanceof Error ? error.message : 'Unknown error'}\`
+    );
   }
-
-  const data = await response.json();
-
-  // Extract the image data from the response
-  let imageBase64: string | null = null;
-  let textResponse: string | null = null;
-
-  for (const candidate of data.candidates || []) {
-    for (const part of candidate.content?.parts || []) {
-      if (part.text) {
-        textResponse = part.text;
-      } else if (part.inlineData) {
-        imageBase64 = part.inlineData.data;
-      }
-    }
-  }
-
-  if (!imageBase64) {
-    throw new FatalError('No image data returned from Google AI');
-  }
-
-  return {
-    image: imageBase64,
-    text: textResponse,
-    mimeType: 'image/png',
-  };
 }
 `,
   dependencies: ['@vercel/workflow'],

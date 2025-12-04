@@ -8,7 +8,9 @@ export const googleGemini: Step = {
   category: 'AI',
   integration: 'google-ai',
   tags: ['ai', 'google', 'gemini', 'llm'],
-  code: `import { FatalError } from 'workflow';
+  code: `import { google } from '@ai-sdk/google';
+import { generateText } from 'ai';
+import { FatalError } from 'workflow';
 
 type GeminiParams = {
   prompt: string;
@@ -25,33 +27,19 @@ export async function googleGemini(params: GeminiParams) {
     throw new FatalError('GOOGLE_AI_API_KEY is required');
   }
 
-  const model = params.model || 'gemini-1.5-pro';
-  const response = await fetch(
-    \`https://generativelanguage.googleapis.com/v1beta/models/\${model}:generateContent?key=\${apiKey}\`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: params.prompt }],
-          },
-        ],
-        generationConfig: {
-          temperature: params.temperature || 0.7,
-        },
-      }),
-    }
-  );
+  try {
+    const { text } = await generateText({
+      model: google(params.model || 'gemini-1.5-pro', { apiKey }),
+      prompt: params.prompt,
+      temperature: params.temperature || 0.7,
+    });
 
-  if (!response.ok) {
-    throw new FatalError(\`Google AI API error: \${response.status}\`);
+    return text;
+  } catch (error) {
+    throw new FatalError(
+      \`Google AI API error: \${error instanceof Error ? error.message : 'Unknown error'}\`
+    );
   }
-
-  const data = await response.json();
-  return data.candidates[0].content.parts[0].text;
 }
 `,
 

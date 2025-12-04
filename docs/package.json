@@ -19,6 +19,11 @@
     "test:steps": "vitest run lib/step-implementations/__tests__"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "2.0.45",
+    "@ai-sdk/cohere": "2.0.19",
+    "@ai-sdk/google": "2.0.40",
+    "@ai-sdk/mistral": "2.0.24",
+    "@ai-sdk/openai": "2.0.71",
     "@biomejs/biome": "catalog:",
     "@hookform/resolvers": "^5.2.2",
     "@mdx-js/mdx": "^3.1.1",
@@ -42,6 +47,7 @@
     "@workflow/typescript-plugin": "workspace:*",
     "@workflow/web": "workspace:*",
     "@workflow/world": "workspace:*",
+    "ai": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

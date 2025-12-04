@@ -9,6 +9,8 @@ export const openaiChat: Step = {
   integration: 'openai',
   tags: ['ai', 'openai', 'gpt', 'llm'],
   code: `import { FatalError } from 'workflow';
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 
 type ChatParams = {
   messages: { role: string; content: string }[];
@@ -25,25 +27,19 @@ export async function openaiChat(params: ChatParams) {
     throw new FatalError('OPENAI_API_KEY is required');
   }
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: \`Bearer \${apiKey}\`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: params.model || 'gpt-4',
+  try {
+    const { text } = await generateText({
+      model: openai(params.model || 'gpt-4', { apiKey }),
       messages: params.messages,
       temperature: params.temperature || 0.7,
-    }),
-  });
+    });
 
-  if (!response.ok) {
-    throw new FatalError(\`OpenAI API error: \${response.status}\`);
+    return text;
+  } catch (error) {
+    throw new FatalError(
+      \`OpenAI API error: \${error instanceof Error ? error.message : 'Unknown error'}\`
+    );
   }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
 }
 `,
 

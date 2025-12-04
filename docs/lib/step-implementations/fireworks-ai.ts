@@ -1,4 +1,6 @@
 import { FatalError } from 'workflow';
+import { generateText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
 
 type FireworksParams = {
   messages: { role: string; content: string }[];
@@ -14,26 +16,23 @@ export async function fireworksAI(params: FireworksParams) {
     throw new FatalError('FIREWORKS_API_KEY is required');
   }
 
-  const response = await fetch(
-    'https://api.fireworks.ai/inference/v1/chat/completions',
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model:
-          params.model || 'accounts/fireworks/models/llama-v3p1-70b-instruct',
-        messages: params.messages,
-      }),
-    }
-  );
+  try {
+    const fireworks = createOpenAI({
+      baseURL: 'https://api.fireworks.ai/inference/v1',
+      apiKey,
+    });
 
-  if (!response.ok) {
-    throw new FatalError(`Fireworks API error: ${response.status}`);
+    const { text } = await generateText({
+      model: fireworks(
+        params.model || 'accounts/fireworks/models/llama-v3p1-70b-instruct'
+      ),
+      messages: params.messages,
+    });
+
+    return text;
+  } catch (error) {
+    throw new FatalError(
+      `Fireworks API error: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
-
-  const data = await response.json();
-  return data.choices[0].message.content;
 }

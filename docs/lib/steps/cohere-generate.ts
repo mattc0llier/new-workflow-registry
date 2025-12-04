@@ -9,6 +9,8 @@ export const cohereGenerate: Step = {
   integration: 'cohere',
   tags: ['ai', 'cohere', 'llm', 'text-generation'],
   code: `import { FatalError } from 'workflow';
+import { generateText } from 'ai';
+import { cohere } from '@ai-sdk/cohere';
 
 type CohereParams = {
   prompt: string;
@@ -26,26 +28,20 @@ export async function cohereGenerate(params: CohereParams) {
     throw new FatalError('COHERE_API_KEY is required');
   }
 
-  const response = await fetch('https://api.cohere.ai/v1/generate', {
-    method: 'POST',
-    headers: {
-      Authorization: \`Bearer \${apiKey}\`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: params.model || 'command',
+  try {
+    const { text } = await generateText({
+      model: cohere(params.model || 'command', { apiKey }),
       prompt: params.prompt,
-      max_tokens: params.max_tokens || 1000,
+      maxTokens: params.max_tokens || 1000,
       temperature: params.temperature || 0.7,
-    }),
-  });
+    });
 
-  if (!response.ok) {
-    throw new FatalError(\`Cohere API error: \${response.status}\`);
+    return text;
+  } catch (error) {
+    throw new FatalError(
+      \`Cohere API error: \${error instanceof Error ? error.message : 'Unknown error'}\`
+    );
   }
-
-  const data = await response.json();
-  return data.generations[0].text;
 }
 `,
 
