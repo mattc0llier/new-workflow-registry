@@ -41,10 +41,6 @@ const links = [
     href: '/integrations',
   },
   {
-    label: 'Builder',
-    href: 'https://workflow-builder.labs.vercel.dev/',
-  },
-  {
     label: 'Examples',
     href: 'https://github.com/vercel/workflow-examples',
   },
