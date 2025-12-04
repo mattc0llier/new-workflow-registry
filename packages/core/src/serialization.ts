@@ -2,6 +2,7 @@ import { WorkflowRuntimeError } from '@workflow/errors';
 import * as devalue from 'devalue';
 import { getStepFunction } from './private.js';
 import { getWorld } from './runtime/world.js';
+import { contextStorage } from './step/context-storage.js';
 import {
   BODY_INIT_SYMBOL,
   STREAM_NAME_SYMBOL,
@@ -114,17 +115,28 @@ export class WorkflowServerReadableStream extends ReadableStream<Uint8Array> {
 }
 
 export class WorkflowServerWritableStream extends WritableStream<Uint8Array> {
-  constructor(name: string) {
+  constructor(name: string, runId: string | Promise<string>) {
+    // runId can be a promise, because we need a runID to write to a stream,
+    // but at class instantiation time, we might not have a run ID yet. This
+    // mainly happens when calling start() for a workflow with already-serialized
+    // arguments.
+    if (typeof runId !== 'string' && !(runId instanceof Promise)) {
+      throw new Error(
+        `"runId" must be a string or a promise that resolves to a string, got "${typeof runId}"`
+      );
+    }
     if (typeof name !== 'string' || name.length === 0) {
       throw new Error(`"name" is required, got "${name}"`);
     }
     const world = getWorld();
     super({
       async write(chunk) {
-        await world.writeToStream(name, chunk);
+        const _runId = await runId;
+        await world.writeToStream(name, _runId, chunk);
       },
       async close() {
-        await world.closeStream(name);
+        const _runId = await runId;
+        await world.closeStream(name, _runId);
       },
     });
   }
@@ -170,7 +182,10 @@ export interface SerializableSpecial {
     redirected: boolean;
   };
   Set: any[];
-  StepFunction: string; // step function name/ID
+  StepFunction: {
+    stepId: string;
+    closureVars?: Record<string, any>;
+  };
   URL: string;
   URLSearchParams: string;
   Uint8Array: string; // base64 string
@@ -204,7 +219,10 @@ function getCommonReducers(global: Record<string, any> = globalThis) {
   ) => {
     // Avoid returning falsy value for zero-length buffers
     if (length === 0) return '.';
-    return Buffer.from(value, offset, length).toString('base64');
+    // Create a proper copy to avoid ArrayBuffer detachment issues
+    // Buffer.from(ArrayBuffer, offset, length) creates a view, not a copy
+    const uint8 = new Uint8Array(value, offset, length);
+    return Buffer.from(uint8).toString('base64');
   };
   const viewToBase64 = (value: ArrayBufferView) =>
     abToBase64(value.buffer, value.byteOffset, value.byteLength);
@@ -280,7 +298,18 @@ function getCommonReducers(global: Record<string, any> = globalThis) {
     StepFunction: (value) => {
       if (typeof value !== 'function') return false;
       const stepId = (value as any).stepId;
-      return typeof stepId === 'string' ? stepId : false;
+      if (typeof stepId !== 'string') return false;
+
+      // Check if the step function has closure variables
+      const closureVarsFn = (value as any).__closureVarsFn;
+      if (closureVarsFn && typeof closureVarsFn === 'function') {
+        // Invoke the closure variables function and serialize along with stepId
+        const closureVars = closureVarsFn();
+        return { stepId, closureVars };
+      }
+
+      // No closure variables - return object with just stepId
+      return { stepId };
     },
     URL: (value) => value instanceof global.URL && value.href,
     URLSearchParams: (value) => {
@@ -312,7 +341,8 @@ function getCommonReducers(global: Record<string, any> = globalThis) {
  */
 export function getExternalReducers(
   global: Record<string, any> = globalThis,
-  ops: Promise<any>[]
+  ops: Promise<void>[],
+  runId: string | Promise<string>
 ): Reducers {
   return {
     ...getCommonReducers(global),
@@ -328,13 +358,15 @@ export function getExternalReducers(
       const name = global.crypto.randomUUID();
       const type = getStreamType(value);
 
-      const writable = new WorkflowServerWritableStream(name);
+      const writable = new WorkflowServerWritableStream(name, runId);
       if (type === 'bytes') {
         ops.push(value.pipeTo(writable));
       } else {
         ops.push(
           value
-            .pipeThrough(getSerializeStream(getExternalReducers(global, ops)))
+            .pipeThrough(
+              getSerializeStream(getExternalReducers(global, ops, runId))
+            )
             .pipeTo(writable)
         );
       }
@@ -346,12 +378,12 @@ export function getExternalReducers(
 
     WritableStream: (value) => {
       if (!(value instanceof global.WritableStream)) return false;
+
       const name = global.crypto.randomUUID();
-      ops.push(
-        new WorkflowServerReadableStream(name)
-          .pipeThrough(getDeserializeStream(getExternalRevivers(global, ops)))
-          .pipeTo(value)
-      );
+
+      const readable = new WorkflowServerReadableStream(name);
+      ops.push(readable.pipeTo(value));
+
       return { name };
     },
   };
@@ -409,11 +441,13 @@ export function getWorkflowReducers(
  *
  * @param global
  * @param ops
+ * @param runId
  * @returns
  */
 function getStepReducers(
   global: Record<string, any> = globalThis,
-  ops: Promise<any>[]
+  ops: Promise<void>[],
+  runId: string | Promise<string>
 ): Reducers {
   return {
     ...getCommonReducers(global),
@@ -433,16 +467,24 @@ function getStepReducers(
       let type = value[STREAM_TYPE_SYMBOL];
 
       if (!name) {
+        if (!runId) {
+          throw new Error(
+            'ReadableStream cannot be serialized without a valid runId'
+          );
+        }
+
         name = global.crypto.randomUUID();
         type = getStreamType(value);
 
-        const writable = new WorkflowServerWritableStream(name);
+        const writable = new WorkflowServerWritableStream(name, runId);
         if (type === 'bytes') {
           ops.push(value.pipeTo(writable));
         } else {
           ops.push(
             value
-              .pipeThrough(getSerializeStream(getStepReducers(global, ops)))
+              .pipeThrough(
+                getSerializeStream(getStepReducers(global, ops, runId))
+              )
               .pipeTo(writable)
           );
         }
@@ -458,10 +500,18 @@ function getStepReducers(
 
       let name = value[STREAM_NAME_SYMBOL];
       if (!name) {
+        if (!runId) {
+          throw new Error(
+            'WritableStream cannot be serialized without a valid runId'
+          );
+        }
+
         name = global.crypto.randomUUID();
         ops.push(
           new WorkflowServerReadableStream(name)
-            .pipeThrough(getDeserializeStream(getStepRevivers(global, ops)))
+            .pipeThrough(
+              getDeserializeStream(getStepRevivers(global, ops, runId))
+            )
             .pipeTo(value)
         );
       }
@@ -524,12 +574,56 @@ export function getCommonRevivers(global: Record<string, any> = globalThis) {
     RegExp: (value) => new global.RegExp(value.source, value.flags),
     Set: (value) => new global.Set(value),
     StepFunction: (value) => {
-      const stepFn = getStepFunction(value);
+      const stepId = value.stepId;
+      const closureVars = value.closureVars;
+
+      const stepFn = getStepFunction(stepId);
       if (!stepFn) {
         throw new Error(
-          `Step function "${value}" not found. Make sure the step function is registered.`
+          `Step function "${stepId}" not found. Make sure the step function is registered.`
         );
       }
+
+      // If closure variables were serialized, return a wrapper function
+      // that sets up AsyncLocalStorage context when invoked
+      if (closureVars) {
+        const wrappedStepFn = ((...args: any[]) => {
+          // Get the current context from AsyncLocalStorage
+          const currentContext = contextStorage.getStore();
+
+          if (!currentContext) {
+            throw new Error(
+              'Cannot call step function with closure variables outside step context'
+            );
+          }
+
+          // Create a new context with the closure variables merged in
+          const newContext = {
+            ...currentContext,
+            closureVars,
+          };
+
+          // Run the step function with the new context that includes closure vars
+          return contextStorage.run(newContext, () => stepFn(...args));
+        }) as any;
+
+        // Copy properties from original step function
+        Object.defineProperty(wrappedStepFn, 'name', {
+          value: stepFn.name,
+        });
+        Object.defineProperty(wrappedStepFn, 'stepId', {
+          value: stepId,
+          writable: false,
+          enumerable: false,
+          configurable: false,
+        });
+        if (stepFn.maxRetries !== undefined) {
+          wrappedStepFn.maxRetries = stepFn.maxRetries;
+        }
+
+        return wrappedStepFn;
+      }
+
       return stepFn;
     },
     URL: (value) => new global.URL(value),
@@ -560,10 +654,12 @@ export function getCommonRevivers(global: Record<string, any> = globalThis) {
  *
  * @param global
  * @param ops
+ * @param runId
  */
 export function getExternalRevivers(
   global: Record<string, any> = globalThis,
-  ops: Promise<any>[]
+  ops: Promise<void>[],
+  runId: string | Promise<string>
 ): Revivers {
   return {
     ...getCommonRevivers(global),
@@ -603,16 +699,20 @@ export function getExternalRevivers(
         return readable;
       } else {
         const transform = getDeserializeStream(
-          getExternalRevivers(global, ops)
+          getExternalRevivers(global, ops, runId)
         );
         ops.push(readable.pipeTo(transform.writable));
         return transform.readable;
       }
     },
     WritableStream: (value) => {
-      const serialize = getSerializeStream(getExternalReducers(global, ops));
+      const serialize = getSerializeStream(
+        getExternalReducers(global, ops, runId)
+      );
       ops.push(
-        serialize.readable.pipeTo(new WorkflowServerWritableStream(value.name))
+        serialize.readable.pipeTo(
+          new WorkflowServerWritableStream(value.name, runId)
+        )
       );
       return serialize.writable;
     },
@@ -691,11 +791,13 @@ export function getWorkflowRevivers(
  *
  * @param global
  * @param ops
+ * @param runId
  * @returns
  */
 function getStepRevivers(
   global: Record<string, any> = globalThis,
-  ops: Promise<any>[]
+  ops: Promise<void>[],
+  runId: string | Promise<string>
 ): Revivers {
   return {
     ...getCommonRevivers(global),
@@ -740,15 +842,25 @@ function getStepRevivers(
       if (value.type === 'bytes') {
         return readable;
       } else {
-        const transform = getDeserializeStream(getStepRevivers(global, ops));
+        const transform = getDeserializeStream(
+          getStepRevivers(global, ops, runId)
+        );
         ops.push(readable.pipeTo(transform.writable));
         return transform.readable;
       }
     },
     WritableStream: (value) => {
-      const serialize = getSerializeStream(getStepReducers(global, ops));
+      if (!runId) {
+        throw new Error(
+          'WritableStream cannot be revived without a valid runId'
+        );
+      }
+
+      const serialize = getSerializeStream(getStepReducers(global, ops, runId));
       ops.push(
-        serialize.readable.pipeTo(new WorkflowServerWritableStream(value.name))
+        serialize.readable.pipeTo(
+          new WorkflowServerWritableStream(value.name, runId)
+        )
       );
       return serialize.writable;
     },
@@ -762,15 +874,20 @@ function getStepRevivers(
  *
  * @param value
  * @param global
+ * @param runId
  * @returns The dehydrated value, ready to be inserted into the database
  */
 export function dehydrateWorkflowArguments(
   value: unknown,
-  ops: Promise<any>[],
+  ops: Promise<void>[],
+  runId: string | Promise<string>,
   global: Record<string, any> = globalThis
 ) {
   try {
-    const str = devalue.stringify(value, getExternalReducers(global, ops));
+    const str = devalue.stringify(
+      value,
+      getExternalReducers(global, ops, runId)
+    );
     return revive(str);
   } catch (error) {
     throw new WorkflowRuntimeError(
@@ -830,17 +947,21 @@ export function dehydrateWorkflowReturnValue(
  * return value of a completed workflow run.
  *
  * @param value
+ * @param ops
  * @param global
+ * @param extraRevivers
+ * @param runId
  * @returns The hydrated return value, ready to be consumed by the client
  */
 export function hydrateWorkflowReturnValue(
   value: Parameters<typeof devalue.unflatten>[0],
-  ops: Promise<any>[],
+  ops: Promise<void>[],
+  runId: string | Promise<string>,
   global: Record<string, any> = globalThis,
   extraRevivers: Record<string, (value: any) => any> = {}
 ) {
   const obj = devalue.unflatten(value, {
-    ...getExternalRevivers(global, ops),
+    ...getExternalRevivers(global, ops, runId),
     ...extraRevivers,
   });
   return obj;
@@ -875,17 +996,21 @@ export function dehydrateStepArguments(
  * from the database at the start of the step execution.
  *
  * @param value
+ * @param ops
  * @param global
+ * @param extraRevivers
+ * @param runId
  * @returns The hydrated value, ready to be consumed by the step user-code function
  */
 export function hydrateStepArguments(
   value: Parameters<typeof devalue.unflatten>[0],
   ops: Promise<any>[],
+  runId: string | Promise<string>,
   global: Record<string, any> = globalThis,
   extraRevivers: Record<string, (value: any) => any> = {}
 ) {
   const obj = devalue.unflatten(value, {
-    ...getStepRevivers(global, ops),
+    ...getStepRevivers(global, ops, runId),
     ...extraRevivers,
   });
   return obj;
@@ -897,16 +1022,19 @@ export function hydrateStepArguments(
  * into a format that can be saved to the database.
  *
  * @param value
+ * @param ops
  * @param global
+ * @param runId
  * @returns The dehydrated value, ready to be inserted into the database
  */
 export function dehydrateStepReturnValue(
   value: unknown,
   ops: Promise<any>[],
+  runId: string | Promise<string>,
   global: Record<string, any> = globalThis
 ) {
   try {
-    const str = devalue.stringify(value, getStepReducers(global, ops));
+    const str = devalue.stringify(value, getStepReducers(global, ops, runId));
     return revive(str);
   } catch (error) {
     throw new WorkflowRuntimeError(
@@ -922,6 +1050,8 @@ export function dehydrateStepReturnValue(
  *
  * @param value
  * @param global
+ * @param extraRevivers
+ * @param runId
  * @returns The hydrated return value of a step, ready to be consumed by the workflow handler
  */
 export function hydrateStepReturnValue(

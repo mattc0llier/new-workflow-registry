@@ -1,5 +1,5 @@
-// Error: sync function with use step
 /**__internal_workflows{"workflows":{"input.js":{"validWorkflow":{"workflowId":"workflow//input.js//validWorkflow"}}},"steps":{"input.js":{"validStep":{"stepId":"step//input.js//validStep"}}}}*/;
+// Error: sync function with use step
 export function syncStep() {
     'use step';
     return 42;
@@ -8,13 +8,6 @@ export function syncStep() {
 export const syncWorkflow = ()=>{
     'use workflow';
     return 'test';
-};
-// Error: sync method with use step
-const obj = {
-    syncMethod () {
-        'use step';
-        return true;
-    }
 };
 // These are ok
 export var validStep = globalThis[Symbol.for("WORKFLOW_USE_STEP")]("step//input.js//validStep");

@@ -1,6 +1,6 @@
 {
   "name": "@workflow/world-postgres",
-  "version": "4.1.0-beta.10",
+  "version": "4.1.0-beta.16",
   "description": "A reference World implementation based on PostgreSQL",
   "type": "module",
   "main": "dist/index.js",
@@ -37,7 +37,7 @@
     "./migrations/*.sql": "./src/drizzle/migrations/*.sql"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x bin/setup.js",
     "dev": "tsc --watch",
     "clean": "tsc --build --clean && rm -rf dist",
     "test": "vitest run",
@@ -45,10 +45,11 @@
     "db:push": "node dist/cli.js"
   },
   "dependencies": {
-    "@vercel/queue": "0.0.0-alpha.23",
+    "@vercel/queue": "catalog:",
     "@workflow/errors": "workspace:*",
     "@workflow/world": "workspace:*",
     "@workflow/world-local": "workspace:*",
+    "cbor-x": "1.6.0",
     "dotenv": "16.4.5",
     "drizzle-orm": "0.44.7",
     "pg-boss": "11.0.7",

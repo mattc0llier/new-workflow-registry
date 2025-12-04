@@ -1,6 +1,7 @@
 import { setTimeout } from 'node:timers/promises';
 import { JsonTransport } from '@vercel/queue';
 import { MessageId, type Queue, ValidQueueName } from '@workflow/world';
+import { Sema } from 'async-sema';
 import { monotonicFactory } from 'ulid';
 import { Agent } from 'undici';
 import z from 'zod';
@@ -13,6 +14,13 @@ const LOCAL_QUEUE_MAX_VISIBILITY =
   parseInt(process.env.WORKFLOW_LOCAL_QUEUE_MAX_VISIBILITY ?? '0', 10) ||
   Infinity;
 
+// The local workers share the same Node.js process and event loop,
+// so we need to limit concurrency to avoid overwhelming the system.
+const DEFAULT_CONCURRENCY_LIMIT = 20;
+const WORKFLOW_LOCAL_QUEUE_CONCURRENCY =
+  parseInt(process.env.WORKFLOW_LOCAL_QUEUE_CONCURRENCY ?? '0', 10) ||
+  DEFAULT_CONCURRENCY_LIMIT;
+
 // Create a custom agent with unlimited headers timeout for long-running steps
 const httpAgent = new Agent({
   headersTimeout: 0,
@@ -21,6 +29,7 @@ const httpAgent = new Agent({
 export function createQueue(config: Partial<Config>): Queue {
   const transport = new JsonTransport();
   const generateId = monotonicFactory();
+  const semaphore = new Sema(WORKFLOW_LOCAL_QUEUE_CONCURRENCY);
 
   /**
    * holds inflight messages by idempotency key to ensure
@@ -58,60 +67,81 @@ export function createQueue(config: Partial<Config>): Queue {
     }
 
     (async () => {
-      let defaultRetriesLeft = 3;
-      const baseUrl = await resolveBaseUrl(config);
-      for (let attempt = 0; defaultRetriesLeft > 0; attempt++) {
-        defaultRetriesLeft--;
-
-        const response = await fetch(
-          `${baseUrl}/.well-known/workflow/v1/${pathname}`,
-          {
-            method: 'POST',
-            duplex: 'half',
-            // @ts-expect-error undici type differences
-            dispatcher: httpAgent,
-            headers: {
-              'content-type': 'application/json',
-              'x-vqs-queue-name': queueName,
-              'x-vqs-message-id': messageId,
-              'x-vqs-message-attempt': String(attempt + 1),
-            },
-            body,
-          }
+      const token = semaphore.tryAcquire();
+      if (!token) {
+        console.warn(
+          `[world-local]: concurrency limit (${WORKFLOW_LOCAL_QUEUE_CONCURRENCY}) reached, waiting for queue to free up`
         );
+        await semaphore.acquire();
+      }
+      try {
+        let defaultRetriesLeft = 3;
+        const baseUrl = await resolveBaseUrl(config);
+        for (let attempt = 0; defaultRetriesLeft > 0; attempt++) {
+          defaultRetriesLeft--;
 
-        if (response.ok) {
-          return;
+          const response = await fetch(
+            `${baseUrl}/.well-known/workflow/v1/${pathname}`,
+            {
+              method: 'POST',
+              duplex: 'half',
+              // @ts-expect-error undici type differences
+              dispatcher: httpAgent,
+              headers: {
+                'content-type': 'application/json',
+                'x-vqs-queue-name': queueName,
+                'x-vqs-message-id': messageId,
+                'x-vqs-message-attempt': String(attempt + 1),
+              },
+              body,
+            }
+          );
+
+          if (response.ok) {
+            return;
+          }
+
+          const text = await response.text();
+
+          if (response.status === 503) {
+            try {
+              const timeoutSeconds = Number(JSON.parse(text).timeoutSeconds);
+              await setTimeout(timeoutSeconds * 1000);
+              defaultRetriesLeft++;
+              continue;
+            } catch {}
+          }
+
+          console.error(`[local world] Failed to queue message`, {
+            queueName,
+            text,
+            status: response.status,
+            headers: Object.fromEntries(response.headers.entries()),
+            body: body.toString(),
+          });
         }
 
-        const text = await response.text();
-
-        if (response.status === 503) {
-          try {
-            const timeoutSeconds = Number(JSON.parse(text).timeoutSeconds);
-            await setTimeout(timeoutSeconds * 1000);
-            defaultRetriesLeft++;
-            continue;
-          } catch {}
+        console.error(
+          `[local world] Reached max retries of local world queue implementation`
+        );
+      } finally {
+        semaphore.release();
+      }
+    })()
+      .catch((err) => {
+        // Silently ignore client disconnect errors (e.g., browser refresh during streaming)
+        // These are expected and should not cause unhandled rejection warnings
+        const isAbortError =
+          err?.name === 'AbortError' || err?.name === 'ResponseAborted';
+        if (!isAbortError) {
+          console.error('[local world] Queue operation failed:', err);
         }
-
-        console.error(`[embedded world] Failed to queue message`, {
-          queueName,
-          text,
-          status: response.status,
-          headers: Object.fromEntries(response.headers.entries()),
-          body: body.toString(),
-        });
-      }
-
-      console.error(
-        `[embedded world] Reached max retries of embedded world queue implementation`
-      );
-    })().finally(() => {
-      for (const fn of cleanup) {
-        fn();
-      }
-    });
+      })
+      .finally(() => {
+        for (const fn of cleanup) {
+          fn();
+        }
+      });
 
     return { messageId };
   };
@@ -169,7 +199,7 @@ export function createQueue(config: Partial<Config>): Queue {
   };
 
   const getDeploymentId: Queue['getDeploymentId'] = async () => {
-    return 'dpl_embedded';
+    return 'dpl_local';
   };
 
   return { queue, createQueueHandler, getDeploymentId };

@@ -1,11 +1,6 @@
 ---
 title: Nitro
----
-
-# Nitro
-
-This guide will walk through setting up your first workflow in a Nitro app. Along the way, you'll learn more about the concepts that are fundamental to using the development kit in your own projects.
-
+description: This guide will walk through setting up your first workflow in a Nitro v3 project. Along the way, you'll learn more about the concepts that are fundamental to using the development kit in your own projects.
 ---
 
 <Steps>
@@ -13,10 +8,10 @@ This guide will walk through setting up your first workflow in a Nitro app. Alon
 <Step>
 ## Create Your Nitro Project
 
-Start by creating a new Nitro project. This command will create a new directory named `nitro-app` and setup a Nitro project inside it.
+Start by creating a new [Nitro v3](https://v3.nitro.build/) project. This command will create a new directory named `nitro-app` and setup a Nitro project inside it.
 
 ```bash
-npx giget@latest nitro nitro-app --install
+npx create-nitro-app
 ```
 
 Enter the newly made directory:
@@ -27,33 +22,22 @@ cd nitro-app
 
 ### Install `workflow`
 
-<Tabs items={['npm', 'pnpm', 'yarn', 'bun']}>
-  <Tab value="npm">
-    <CodeBlock>npm i workflow</CodeBlock>
-  </Tab>
-  <Tab value="pnpm">
-    <CodeBlock>pnpm i workflow</CodeBlock>
-  </Tab>
-  <Tab value="yarn">
-    <CodeBlock>yarn add workflow</CodeBlock>
-  </Tab>
-  <Tab value="bun">
-    <CodeBlock>bun add workflow</CodeBlock>
-  </Tab>
-</Tabs>
+```package-install
+npm i workflow
+```
 
 ### Configure Nitro
 
-Add `workflow/nitro` to your `nitro.config.ts` This enables usage of the `"use workflow"` and `"use step"` directives.
+Add `workflow/nitro` module to your `nitro.config.ts` This enables usage of the `"use workflow"` and `"use step"` directives.
 
 ```typescript title="nitro.config.ts" lineNumbers
-import { defineNitroConfig } from "nitropack/config";
+import { defineConfig } from "nitro";
 
-export default defineNitroConfig({
-  compatibilityDate: "latest",
-  srcDir: "server",
+export default defineConfig({
+  serverDir: "./server",
   modules: ["workflow/nitro"],
 });
+
 ```
 
 <Accordion type="single" collapsible>
@@ -175,18 +159,16 @@ To invoke your new workflow, we'll create a new API route handler at `server/api
 
 ```typescript title="server/api/signup.post.ts"
 import { start } from 'workflow/api';
-import { defineEventHandler, readBody } from 'h3';
+import { defineEventHandler } from 'nitro/h3';
 import { handleUserSignup } from "../../workflows/user-signup";
 
-export default defineEventHandler(async (event) => {
-  const { email } = await readBody(event);
-
+export default defineEventHandler(async ({ req }) => {
+  const { email } = await req.json() as { email: string };
   // Executes asynchronously and doesn't block your app
   await start(handleUserSignup, [email]);
-
-  return Response.json({
+  return {
     message: "User signup workflow started",
-  });
+  }
 });
 ```
 
@@ -220,7 +202,10 @@ Check the Nitro development server logs to see your workflow execute as well as 
 Additionally, you can use the [Workflow DevKit CLI or Web UI](/docs/observability) to inspect your workflow runs and steps in detail.
 
 ```bash
-npx workflow inspect runs # add '--web' for an interactive Web based UI
+# Open the observability Web UI
+npx workflow web
+# or if you prefer a terminal interface, use the CLI inspect command
+npx workflow inspect runs
 ```
 
 <img src="/o11y-ui.png" alt="Workflow DevKit Web UI" />
@@ -228,8 +213,6 @@ npx workflow inspect runs # add '--web' for an interactive Web based UI
 </Step>
 
 </Steps>
-
----
 
 ## Deploying to production
 

@@ -1,5 +1,111 @@
 # @workflow/builders
 
+## 4.0.1-beta.22
+
+### Patch Changes
+
+- @workflow/core@4.0.1-beta.23
+
+## 4.0.1-beta.21
+
+### Patch Changes
+
+- ac7997b: Update to latest swc/core and preserve JSX
+- Updated dependencies [ac7997b]
+- Updated dependencies [02c41cc]
+  - @workflow/swc-plugin@4.0.1-beta.11
+  - @workflow/core@4.0.1-beta.22
+
+## 4.0.1-beta.20
+
+### Patch Changes
+
+- Updated dependencies [2f0840b]
+- Updated dependencies [555d7a6]
+  - @workflow/core@4.0.1-beta.21
+  - @workflow/swc-plugin@4.0.1-beta.10
+
+## 4.0.1-beta.19
+
+### Patch Changes
+
+- d53bf90: Fix StandaloneBuilder to scan all directories for workflows
+- 3c19e90: Fix Nitro and SvelteKit build race conditions and make writing debug file atomic
+- 1ac5592: Add @workflow/astro package
+- Updated dependencies [0f1645b]
+- Updated dependencies [5b91861]
+- Updated dependencies [bdde1bd]
+- Updated dependencies [0cacb99]
+- Updated dependencies [8d4562e]
+  - @workflow/core@4.0.1-beta.20
+  - @workflow/swc-plugin@4.0.1-beta.9
+  - @workflow/errors@4.0.1-beta.7
+
+## 4.0.1-beta.18
+
+### Patch Changes
+
+- b042ba7: Externalize bun from step bundles
+- Updated dependencies [07800c2]
+- Updated dependencies [fb9fd0f]
+- Updated dependencies [8b470f0]
+  - @workflow/core@4.0.1-beta.19
+  - @workflow/swc-plugin@4.0.1-beta.8
+  - @workflow/errors@4.0.1-beta.6
+
+## 4.0.1-beta.17
+
+### Patch Changes
+
+- @workflow/core@4.0.1-beta.18
+
+## 4.0.1-beta.16
+
+### Patch Changes
+
+- @workflow/core@4.0.1-beta.17
+- @workflow/errors@4.0.1-beta.6
+
+## 4.0.1-beta.15
+
+### Patch Changes
+
+- 73b6c68: Remove suppressUndefinedRejection from BaseBuilder
+- Updated dependencies [3436629]
+- Updated dependencies [9961140]
+- Updated dependencies [73b6c68]
+  - @workflow/core@4.0.1-beta.16
+
+## 4.0.1-beta.14
+
+### Patch Changes
+
+- Updated dependencies [e5c5236]
+  - @workflow/swc-plugin@4.0.1-beta.7
+
+## 4.0.1-beta.13
+
+### Patch Changes
+
+- Updated dependencies [3d99d6d]
+  - @workflow/core@4.0.1-beta.15
+
+## 4.0.1-beta.12
+
+### Patch Changes
+
+- Updated dependencies [6e41c90]
+  - @workflow/core@4.0.1-beta.14
+
+## 4.0.1-beta.11
+
+### Patch Changes
+
+- Updated dependencies [2fde24e]
+- Updated dependencies [4b70739]
+  - @workflow/core@4.0.1-beta.13
+  - @workflow/errors@4.0.1-beta.5
+
 ## 4.0.1-beta.10
 
 ### Patch Changes

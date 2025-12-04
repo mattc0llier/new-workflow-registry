@@ -1,5 +1,21 @@
 # @workflow/errors
 
+## 4.0.1-beta.7
+
+### Patch Changes
+
+- Updated dependencies [bc9b628]
+- Updated dependencies [34f3f86]
+- Updated dependencies [cd451e0]
+  - @workflow/utils@4.0.1-beta.5
+
+## 4.0.1-beta.6
+
+### Patch Changes
+
+- Updated dependencies [edb69c3]
+  - @workflow/utils@4.0.1-beta.4
+
 ## 4.0.1-beta.5
 
 ### Patch Changes

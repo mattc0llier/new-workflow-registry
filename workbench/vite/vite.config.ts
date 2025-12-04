@@ -4,4 +4,8 @@ import { workflow } from 'workflow/vite';
 
 export default defineConfig({
   plugins: [nitro(), workflow()],
+  nitro: {
+    serverDir: './',
+    plugins: ['plugins/start-pg-world.ts'],
+  },
 });

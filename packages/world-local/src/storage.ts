@@ -121,7 +121,7 @@ function createHooksStorage(basedir: string): Storage['hooks'] {
 
   async function create(runId: string, data: CreateHookRequest): Promise<Hook> {
     // Check if a hook with the same token already exists
-    // Token uniqueness is enforced globally per embedded environment
+    // Token uniqueness is enforced globally per local environment
     const existingHook = await findHookByToken(data.token);
     if (existingHook) {
       throw new Error(
@@ -136,9 +136,9 @@ function createHooksStorage(basedir: string): Storage['hooks'] {
       hookId: data.hookId,
       token: data.token,
       metadata: data.metadata,
-      ownerId: 'embedded-owner',
-      projectId: 'embedded-project',
-      environment: 'embedded',
+      ownerId: 'local-owner',
+      projectId: 'local-project',
+      environment: 'local',
       createdAt: now,
     } as Hook;
 
@@ -273,6 +273,15 @@ export function createStorage(basedir: string): Storage {
         return filterRunData(run, resolveData);
       },
 
+      /**
+       * Updates a workflow run.
+       *
+       * Note: This operation is not atomic. Concurrent updates from multiple
+       * processes may result in lost updates (last writer wins). This is an
+       * inherent limitation of filesystem-based storage without locking.
+       * For the local world, this is acceptable as it's typically
+       * used in single-process scenarios.
+       */
       async update(id, data) {
         const runPath = path.join(basedir, 'runs', `${id}.json`);
         const run = await readJSON(runPath, WorkflowRunSchema);
@@ -421,6 +430,13 @@ export function createStorage(basedir: string): Storage {
         return filterStepData(step, resolveData);
       },
 
+      /**
+       * Updates a step.
+       *
+       * Note: This operation is not atomic. Concurrent updates from multiple
+       * processes may result in lost updates (last writer wins). This is an
+       * inherent limitation of filesystem-based storage without locking.
+       */
       async update(runId, stepId, data) {
         const compositeKey = `${runId}-${stepId}`;
         const stepPath = path.join(basedir, 'steps', `${compositeKey}.json`);

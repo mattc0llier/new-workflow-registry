@@ -13,8 +13,8 @@ const DEV_TEST_CONFIGS = {
     apiFileImportPath: '../../..',
   },
   nitro: {
-    generatedStepPath: '.nitro/workflow/steps.mjs',
-    generatedWorkflowPath: '.nitro/workflow/workflows.mjs',
+    generatedStepPath: 'node_modules/.nitro/workflow/steps.mjs',
+    generatedWorkflowPath: 'node_modules/.nitro/workflow/workflows.mjs',
     apiFilePath: 'routes/api/chat.post.ts',
     apiFileImportPath: '../..',
   },
@@ -32,16 +32,35 @@ const DEV_TEST_CONFIGS = {
     workflowsDir: 'src/workflows',
   },
   vite: {
-    generatedStepPath: '.nitro/workflow/steps.mjs',
-    generatedWorkflowPath: '.nitro/workflow/workflows.mjs',
+    generatedStepPath: 'node_modules/.nitro/workflow/steps.mjs',
+    generatedWorkflowPath: 'node_modules/.nitro/workflow/workflows.mjs',
     apiFilePath: 'routes/api/trigger.post.ts',
     apiFileImportPath: '../..',
   },
   hono: {
-    generatedStepPath: '.nitro/workflow/steps.mjs',
-    generatedWorkflowPath: '.nitro/workflow/workflows.mjs',
-    apiFilePath: 'server.ts',
-    apiFileImportPath: '.',
+    generatedStepPath: 'node_modules/.nitro/workflow/steps.mjs',
+    generatedWorkflowPath: 'node_modules/.nitro/workflow/workflows.mjs',
+    apiFilePath: './src/index.ts',
+    apiFileImportPath: '..',
+  },
+  express: {
+    generatedStepPath: 'node_modules/.nitro/workflow/steps.mjs',
+    generatedWorkflowPath: 'node_modules/.nitro/workflow/workflows.mjs',
+    apiFilePath: './src/index.ts',
+    apiFileImportPath: '..',
+  },
+  fastify: {
+    generatedStepPath: 'node_modules/.nitro/workflow/steps.mjs',
+    generatedWorkflowPath: 'node_modules/.nitro/workflow/workflows.mjs',
+    apiFilePath: './src/index.ts',
+    apiFileImportPath: '..',
+  },
+  astro: {
+    generatedStepPath: 'src/pages/.well-known/workflow/v1/step.js',
+    generatedWorkflowPath: 'src/pages/.well-known/workflow/v1/flow.js',
+    apiFilePath: 'src/pages/api/chat.ts',
+    apiFileImportPath: '../..',
+    workflowsDir: 'src/workflows',
   },
 };
 
@@ -98,6 +117,21 @@ matrix.app.push({
   name: 'vite',
   project: 'workbench-vite-workflow',
   ...DEV_TEST_CONFIGS.vite,
+});
+
+matrix.app.push({
+  name: 'express',
+  project: 'workbench-express-workflow',
+  ...DEV_TEST_CONFIGS.express,
+});
+
+matrix.app.push({
+  name: 'fastify',
+  project: 'workbench-fastify-workflow',
+  ...DEV_TEST_CONFIGS.fastify,
+  name: 'astro',
+  project: 'workbench-astro-workflow',
+  ...DEV_TEST_CONFIGS.astro,
 });
 
 console.log(JSON.stringify(matrix));

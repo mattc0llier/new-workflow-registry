@@ -1,5 +1,92 @@
 # @workflow/web-shared
 
+## 4.0.1-beta.24
+
+### Patch Changes
+
+- @workflow/core@4.0.1-beta.23
+
+## 4.0.1-beta.23
+
+### Patch Changes
+
+- Updated dependencies [02c41cc]
+  - @workflow/core@4.0.1-beta.22
+
+## 4.0.1-beta.22
+
+### Patch Changes
+
+- Updated dependencies [2f0840b]
+  - @workflow/core@4.0.1-beta.21
+
+## 4.0.1-beta.21
+
+### Patch Changes
+
+- Updated dependencies [0f1645b]
+- Updated dependencies [10c5b91]
+- Updated dependencies [bdde1bd]
+- Updated dependencies [8d4562e]
+  - @workflow/core@4.0.1-beta.20
+  - @workflow/world@4.0.1-beta.8
+
+## 4.0.1-beta.20
+
+### Patch Changes
+
+- fb9fd0f: Add support for closure scope vars in step functions
+- Updated dependencies [07800c2]
+- Updated dependencies [fb9fd0f]
+  - @workflow/core@4.0.1-beta.19
+  - @workflow/world@4.0.1-beta.7
+
+## 4.0.1-beta.19
+
+### Patch Changes
+
+- @workflow/core@4.0.1-beta.18
+
+## 4.0.1-beta.18
+
+### Patch Changes
+
+- @workflow/core@4.0.1-beta.17
+
+## 4.0.1-beta.17
+
+### Patch Changes
+
+- 9961140: Fix hydration of eventData for sleep calls
+- Updated dependencies [3436629]
+- Updated dependencies [9961140]
+- Updated dependencies [73b6c68]
+  - @workflow/core@4.0.1-beta.16
+
+## 4.0.1-beta.16
+
+### Patch Changes
+
+- Updated dependencies [3d99d6d]
+  - @workflow/core@4.0.1-beta.15
+
+## 4.0.1-beta.15
+
+### Patch Changes
+
+- Updated dependencies [6e41c90]
+  - @workflow/core@4.0.1-beta.14
+
+## 4.0.1-beta.14
+
+### Patch Changes
+
+- 4b70739: Require specifying runId when writing to stream
+- Updated dependencies [2fde24e]
+- Updated dependencies [4b70739]
+  - @workflow/core@4.0.1-beta.13
+  - @workflow/world@4.0.1-beta.6
+
 ## 4.0.1-beta.13
 
 ### Patch Changes

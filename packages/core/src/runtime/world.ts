@@ -1,20 +1,25 @@
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import type { World } from '@workflow/world';
-import { createEmbeddedWorld } from '@workflow/world-local';
+import { createLocalWorld } from '@workflow/world-local';
 import { createVercelWorld } from '@workflow/world-vercel';
 
 const require = createRequire(join(process.cwd(), 'index.js'));
 
-let worldCache: World | undefined;
-let stubbedWorldCache: World | undefined;
+const WorldCache = Symbol.for('@workflow/world//cache');
+const StubbedWorldCache = Symbol.for('@workflow/world//stubbedCache');
 
-function defaultWorld(): 'vercel' | 'embedded' {
+const globalSymbols: typeof globalThis & {
+  [WorldCache]?: World;
+  [StubbedWorldCache]?: World;
+} = globalThis;
+
+function defaultWorld(): 'vercel' | 'local' {
   if (process.env.VERCEL_DEPLOYMENT_ID) {
     return 'vercel';
   }
 
-  return 'embedded';
+  return 'local';
 }
 
 /**
@@ -37,9 +42,9 @@ export const createWorld = (): World => {
     });
   }
 
-  if (targetWorld === 'embedded') {
-    return createEmbeddedWorld({
-      dataDir: process.env.WORKFLOW_EMBEDDED_DATA_DIR,
+  if (targetWorld === 'local') {
+    return createLocalWorld({
+      dataDir: process.env.WORKFLOW_LOCAL_DATA_DIR,
     });
   }
 
@@ -67,22 +72,22 @@ export const createWorld = (): World => {
  * be able to re-combine getWorld and getWorldHandlers into one singleton.
  */
 export const getWorldHandlers = (): Pick<World, 'createQueueHandler'> => {
-  if (stubbedWorldCache) {
-    return stubbedWorldCache;
+  if (globalSymbols[StubbedWorldCache]) {
+    return globalSymbols[StubbedWorldCache];
   }
   const _world = createWorld();
-  stubbedWorldCache = _world;
+  globalSymbols[StubbedWorldCache] = _world;
   return {
     createQueueHandler: _world.createQueueHandler,
   };
 };
 
 export const getWorld = (): World => {
-  if (worldCache) {
-    return worldCache;
+  if (globalSymbols[WorldCache]) {
+    return globalSymbols[WorldCache];
   }
-  worldCache = createWorld();
-  return worldCache;
+  globalSymbols[WorldCache] = createWorld();
+  return globalSymbols[WorldCache];
 };
 
 /**
@@ -90,6 +95,6 @@ export const getWorld = (): World => {
  * variables change and you need to reinitialize the world with new config.
  */
 export const setWorld = (world: World | undefined): void => {
-  worldCache = world;
-  stubbedWorldCache = world;
+  globalSymbols[WorldCache] = world;
+  globalSymbols[StubbedWorldCache] = world;
 };

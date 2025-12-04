@@ -1,7 +1,6 @@
 import { waitUntil } from '@vercel/functions';
 import { ERROR_SLUGS, WorkflowRuntimeError } from '@workflow/errors';
-import type { Hook } from '@workflow/world';
-import type { WorkflowInvokePayload } from '../schemas.js';
+import type { Hook, WorkflowInvokePayload } from '@workflow/world';
 import {
   dehydrateStepReturnValue,
   hydrateStepArguments,
@@ -23,7 +22,7 @@ export async function getHookByToken(token: string): Promise<Hook> {
   const world = getWorld();
   const hook = await world.hooks.getByToken(token);
   if (typeof hook.metadata !== 'undefined') {
-    hook.metadata = hydrateStepArguments(hook.metadata as any, [], globalThis);
+    hook.metadata = hydrateStepArguments(hook.metadata as any, [], hook.runId);
   }
   return hook;
 }
@@ -79,9 +78,14 @@ export async function resumeHook<T = any>(
         const dehydratedPayload = dehydrateStepReturnValue(
           payload,
           ops,
-          globalThis
+          hook.runId
         );
-        waitUntil(Promise.all(ops));
+        // NOTE: Workaround instead of injecting catching undefined unhandled rejections in webhook bundle
+        waitUntil(
+          Promise.all(ops).catch((err) => {
+            if (err !== undefined) throw err;
+          })
+        );
 
         // Create a hook_received event with the payload
         await world.events.create(hook.runId, {
