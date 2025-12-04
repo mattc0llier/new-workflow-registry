@@ -29,6 +29,22 @@ const links = [
     href: '/docs',
   },
   {
+    label: 'Steps',
+    href: '/steps',
+  },
+  {
+    label: 'Workflows',
+    href: '/workflows',
+  },
+  {
+    label: 'Integrations',
+    href: '/integrations',
+  },
+  {
+    label: 'Builder',
+    href: 'https://workflow-builder.labs.vercel.dev/',
+  },
+  {
     label: 'Examples',
     href: 'https://github.com/vercel/workflow-examples',
   },
